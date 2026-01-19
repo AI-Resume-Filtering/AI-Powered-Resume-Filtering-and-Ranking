@@ -1,36 +1,31 @@
-# section_detector.py
-
-from constants import SECTION_KEYWORDS
-
-def is_heading(line: str):
-    clean = line.strip().lower()
-
-    if len(clean) > 40:
-        return None
-    if "." in clean:
-        return None
-
-    for section, keywords in SECTION_KEYWORDS.items():
-        for kw in keywords:
-            if clean == kw:
-                return section
-    return None
-
+SECTION_HEADERS = {
+    "summary": ["professional summary", "summary"],
+    "technical_skills": ["technical skills"],
+    "projects": ["projects"],
+    "experience": ["experience", "internship"],
+    "education": ["education"],
+    "certifications": ["certifications"],
+    "achievements": ["achievements"],
+    "behavioural": ["behavioural skills"]
+}
 
 def detect_sections(text: str) -> dict:
-    sections = {key: [] for key in SECTION_KEYWORDS}
-    current_section = None
+    sections = {}
+    current_section = "unknown"
+    sections[current_section] = []
 
-    lines = text.split("\n")
+    for line in text.split("\n"):
+        clean = line.strip().lower()
 
-    for line in lines:
-        heading = is_heading(line)
+        matched = False
+        for section, keywords in SECTION_HEADERS.items():
+            if clean in keywords:
+                current_section = section
+                sections[current_section] = []
+                matched = True
+                break
 
-        if heading:
-            current_section = heading
-            continue
-
-        if current_section and line.strip():
+        if not matched and line.strip():
             sections[current_section].append(line.strip())
 
     return sections

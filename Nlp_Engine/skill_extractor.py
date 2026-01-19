@@ -1,12 +1,13 @@
-# skill_extractor.py
+from tech_phrases import TECH_PHRASES
 
-from constants import STOPWORDS
+def extract_explicit_skills(tech_zones: dict) -> dict:
+    skills = {}
 
-def extract_skills(words: list[str]) -> dict:
-    skill_count = {}
+    for lines in tech_zones.values():
+        text = " ".join(lines).lower()
 
-    for word in words:
-        if word.isalpha() and word not in STOPWORDS:
-            skill_count[word] = skill_count.get(word, 0) + 1
+        for phrase in TECH_PHRASES:
+            if phrase.lower() in text:
+                skills[phrase] = skills.get(phrase, 0) + 1
 
-    return skill_count
+    return skills

@@ -1,29 +1,22 @@
-# nlp_pipeline.py
-
-from text_preprocessor import preprocess_text
+from text_normalizer import normalize_text
 from section_detector import detect_sections
-from project_extractor import extract_project_metrics
-from certification_extractor import extract_certifications
-from publication_extractor import extract_publications
-from skill_extractor import extract_skills
-from experience_extractor import extract_experience
-
+from zone_classifier import classify_zones
+from skill_extractor import extract_explicit_skills
+from skill_inference import infer_skills
+from project_parser import parse_projects
+from experience_parser import parse_experience
 
 def process_resume_nlp(text: str) -> dict:
-    clean_text = text.lower()
+    text = normalize_text(text)
     sections = detect_sections(text)
+    zones = classify_zones(sections)
 
-    skills = extract_skills(" ".join(sections["technical_skills"]).split())
-    experience = extract_experience(text)
-
-    projects = extract_project_metrics(sections["projects"])
-    certifications = extract_certifications(sections["certifications"])
-    publications = extract_publications(sections["publications"])
+    explicit_skills = extract_explicit_skills(zones["tech_zones"])
+    inferred_skills = infer_skills(zones["context_zones"], explicit_skills)
 
     return {
-        "technical_skills": skills,
-        "experience_years": experience,
-        "projects": projects,
-        "certifications": certifications,
-        "publications": publications
+        "explicit_skills": explicit_skills,
+        "inferred_skills": inferred_skills,
+        "projects": parse_projects(sections.get("projects", [])),
+        "experience_years": parse_experience(text)
     }

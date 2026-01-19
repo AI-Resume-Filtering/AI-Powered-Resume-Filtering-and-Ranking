@@ -1,0 +1,44 @@
+MAHESH S. NIKAS
+maheshnikas121@gmail.com
++91 9356736650
+github.com/Mahesh-Nikas
+linkedin.com/in/mahesh-nikas93/
+
+PROFESSIONAL SUMMARY
+Final-year IT student (Expected 2026) with practical experience in Java, Python, SQL, and backend development through internships and projects. Strong in problem-solving, database management, and building scalable applications. Seeking an entry-level Software Engineer role.
+
+TECHNICAL SKILLS
+Programming Languages: Java, Python, C, C++
+Frontend: HTML, CSS, JavaScript
+Backend: JSP, Servlets, JDBC
+Databases: MySQL, OracleDB, MongoDB
+Version Control & Tools: Git, GitHub, Docker, Power BI
+Libraries: NumPy, Pandas, Matplotlib
+Emerging Technologies: Blockchain, Machine learning, Artificial Intelligence
+
+BEHAVIORAL SKILLS
+Leadership, Team player, Disciplined and Punctual, Problem Solver, Quick Learner
+
+EDUCATION
+B.E. Information Technology – 69.10%, Mauli College of Engineering, Shegaon (2026)
+HSC –71%, Shri A P Patil Vidyalaya Naigaon (2021–2022)
+SSC – 82%, Shri A P Patil Vidyalaya Naigaon (2019–2020)
+
+PROJECTS
+Smart Attendance Tracker
+Automated attendance system using face recognition and location validation.
+Tech Stack: Python, OpenCV, Flask, MongoDB
+
+AI-Powered Resume Filtering System (Ongoing)
+NLP-based resume screening with keyword extraction and ranking.
+Tech Stack: Python, Flask, MongoDB, NLTK, spaCy
+
+Online Examination Platform
+Console-based exam system using Java OOP, Collections, JDBC, and Multithreading
+Features: User authentication, timed questions, auto-submission, score calculation
+Tech Stack: Java, JDBC, MySQL, Multithreading
+
+INTERNSHIP AND ACHIEVEMENTS
+Java Full Stack Intern – RS-Softtech, Pune (2025)
+Secretary – ITSA (Information Technology Students Association) (2024–25)
+AICTE Virtual Internship – AI/ML & Cloud
