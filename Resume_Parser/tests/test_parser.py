@@ -11,15 +11,15 @@ from utils.text_cleaner import clean_text
 
 parser = ResumeParser()
 
-RESUME_FOLDER = "resume_parser/resumes"
-OUTPUT_FILE = "resume_parser/requirements.txt"
+RESUME_FOLDER = "resumes"
+OUTPUT_FILE = "requirements.txt"
 
 open(OUTPUT_FILE, "w").close()
 
 for file_name in os.listdir(RESUME_FOLDER):
     file_path = os.path.join(RESUME_FOLDER, file_name)
 
-    if file_name.lower().endswith((".pdf", ".txt")):
+    if file_name.lower().endswith((".pdf")):
         try:
             text = parser.parse(file_path)
             cleaned_text = clean_text(text)

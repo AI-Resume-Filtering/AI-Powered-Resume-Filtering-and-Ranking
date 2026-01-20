@@ -1,6 +1,6 @@
 import os
 import pdfplumber
-from resume_parser.utils.text_cleaner import clean_text
+from utils.text_cleaner import clean_text
 
 
 class ResumeParser:
@@ -12,8 +12,6 @@ class ResumeParser:
 
         if extension == ".pdf":
             raw_text = self._parse_pdf(file_path)
-        elif extension == ".txt":
-            raw_text = self._parse_txt(file_path)
         else:
             raise ValueError("Unsupported file format")
 
