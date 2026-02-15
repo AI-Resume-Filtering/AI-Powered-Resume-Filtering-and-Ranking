@@ -1,0 +1,212 @@
+{
+  "metadata": {
+    "request_id": "REQ_20260214_185503",
+    "processed_at": "2026-02-14T18:55:04.193561",
+    "total_resumes": 2,
+    "successfully_parsed": 2,
+    "failed": 0
+  },
+  "job_requirements": {
+    "job_title": "Data Scientist",
+    "required_skills": [
+      "python",
+      "c",
+      "r",
+      "machine learning",
+      "deep learning",
+      "tensorflow",
+      "pytorch",
+      "sql",
+      "pandas",
+      "numpy"
+    ],
+    "preferred_skills": [
+      "c",
+      "go",
+      "r",
+      "machine learning",
+      "natural language processing",
+      "nlp",
+      "computer vision",
+      "typescript",
+      "docker",
+      "aws"
+    ],
+    "minimum_experience": 3,
+    "required_education": "bachelors",
+    "responsibilities": [],
+    "total_requirements": 20
+  },
+  "resumes": {
+    "resume_001": {
+      "resume_filename": "Mahesh_Nikas_for_Job_Fair.txt",
+      "sequential_id": "001",
+      "contact_info": {
+        "email": "maheshnikas121@gmail.com",
+        "phone": "+91 9356736650"
+      },
+      "skills": [
+        "python",
+        "java",
+        "javascript",
+        "c++",
+        "c",
+        "go",
+        "r",
+        "machine learning",
+        "deep learning",
+        "artificial intelligence",
+        "natural language processing",
+        "nlp",
+        "sql",
+        "mysql",
+        "mongodb",
+        "oracle",
+        "flask",
+        "jsp",
+        "servlets",
+        "jdbc",
+        "html",
+        "css",
+        "react",
+        "typescript",
+        "git",
+        "github",
+        "docker",
+        "pandas",
+        "numpy",
+        "matplotlib",
+        "blockchain",
+        "web3"
+      ],
+      "skill_categories": {
+        "programming_language": 7,
+        "ai_ml": 8,
+        "database": 4,
+        "backend": 4,
+        "frontend": 4,
+        "tools": 5
+      },
+      "experience_years": 3,
+      "education_level": "bachelors",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": [
+          "c",
+          "deep learning",
+          "machine learning",
+          "sql",
+          "r",
+          "numpy",
+          "pandas",
+          "python"
+        ],
+        "matched_preferred_skills": [
+          "go",
+          "c",
+          "nlp",
+          "machine learning",
+          "natural language processing",
+          "typescript",
+          "docker",
+          "r"
+        ],
+        "missing_required_skills": [
+          "tensorflow",
+          "pytorch"
+        ],
+        "match_percentage": 80.0,
+        "experience_match": true,
+        "education_match": true
+      },
+      "scoring_ready": true
+    },
+    "resume_002": {
+      "resume_filename": "Mahesh_Nikas_IT_2026.txt",
+      "sequential_id": "002",
+      "contact_info": {
+        "email": "maheshnikas121@gmail.com",
+        "phone": "+91 9356736650"
+      },
+      "skills": [
+        "python",
+        "java",
+        "javascript",
+        "c++",
+        "c",
+        "go",
+        "r",
+        "machine learning",
+        "artificial intelligence",
+        "natural language processing",
+        "nlp",
+        "computer vision",
+        "tensorflow",
+        "opencv",
+        "spacy",
+        "nltk",
+        "sql",
+        "mysql",
+        "mongodb",
+        "oracle",
+        "flask",
+        "jsp",
+        "servlets",
+        "jdbc",
+        "html",
+        "css",
+        "typescript",
+        "git",
+        "github",
+        "docker",
+        "power bi",
+        "pandas",
+        "numpy",
+        "matplotlib",
+        "blockchain"
+      ],
+      "skill_categories": {
+        "programming_language": 7,
+        "ai_ml": 12,
+        "database": 4,
+        "backend": 4,
+        "frontend": 3,
+        "tools": 5
+      },
+      "experience_years": 1,
+      "education_level": "bachelors",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": [
+          "c",
+          "tensorflow",
+          "machine learning",
+          "sql",
+          "r",
+          "numpy",
+          "pandas",
+          "python"
+        ],
+        "matched_preferred_skills": [
+          "go",
+          "c",
+          "nlp",
+          "machine learning",
+          "natural language processing",
+          "typescript",
+          "docker",
+          "r",
+          "computer vision"
+        ],
+        "missing_required_skills": [
+          "pytorch",
+          "deep learning"
+        ],
+        "match_percentage": 80.0,
+        "experience_match": false,
+        "education_match": true
+      },
+      "scoring_ready": true
+    }
+  }
+}

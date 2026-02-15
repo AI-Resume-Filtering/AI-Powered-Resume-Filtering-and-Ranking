@@ -31,8 +31,8 @@ wheels/
 *.swo
 *~
 
-# Output files (keep folder structure, ignore generated files)
-Nlp_Engine/output/*.json
+## Output files (keep folder structure, ignore generated files)
+#Nlp_Engine/output/*.json
 Nlp_Engine/output/*.log
 !Nlp_Engine/output/README.md
 
