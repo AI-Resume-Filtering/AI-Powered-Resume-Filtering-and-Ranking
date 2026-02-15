@@ -241,7 +241,7 @@ Ranking: #2 out of 50 candidates
 # Mahesh gives you structured data
 # You compare it with job requirements
 #scorer = CandidateScorer()
-#result = scorer.score(candidate, job_requirements)
+#result = scorer.score(candidate, JD_001)
 
 # Return: Clear ranking with explanation
 # Mayur sends it to Pavan

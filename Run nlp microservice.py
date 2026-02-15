@@ -4,7 +4,7 @@ Simple script to test microservice functionality
 """
 
 import os
-from Nlp_service import process_resumes
+from Nlp_Engine import process_resumes
 # ============================================
 # CONFIGURATION
 # ============================================
@@ -13,7 +13,7 @@ from Nlp_service import process_resumes
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # JD path (change this to your JD location)
-JD_PATH = os.path.join(ROOT_DIR, "Resume_Parser", "Parsed_JD", "JD_001")
+JD_PATH = os.path.join(ROOT_DIR, "Resume_Parser", "Parsed_JD", "Full stack.txt")
 
 # Resume folder (change this to where your parsed resumes are)
 RESUME_FOLDER = os.path.join(ROOT_DIR, "Resume_Parser", "parsed_resumes")
@@ -45,13 +45,12 @@ if __name__ == "__main__":
         exit(1)
 
     print(f"📋 Found {len(resume_files)} resumes to process")
-   
+
 
     # Process using microservice
     result = process_resumes(
         jd_path=JD_PATH,
         resume_paths=resume_files,
-        output_dir=OUTPUT_DIR
     )
 
     # # Display results
