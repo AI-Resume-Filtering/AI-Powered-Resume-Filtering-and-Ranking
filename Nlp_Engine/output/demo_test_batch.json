@@ -1,0 +1,45 @@
+{
+    "resumes": {
+        "101": {
+            "resume_filename": "Alice_Python_Dev.pdf",
+            "skills": [
+                "python",
+                "flask",
+                "django",
+                "aws"
+            ],
+            "experience_years": 3,
+            "education_level": "bachelors",
+            "job_match": {
+                "match_percentage": 85.0
+            },
+            "scoring_ready": true
+        },
+        "102": {
+            "resume_filename": "Bob_Manager.pdf",
+            "skills": [
+                "leadership",
+                "excel"
+            ],
+            "experience_years": 10,
+            "education_level": "masters",
+            "job_match": {
+                "match_percentage": 40.0
+            },
+            "scoring_ready": true
+        },
+        "103": {
+            "resume_filename": "Charlie_Fresher.pdf",
+            "skills": [
+                "python",
+                "html"
+            ],
+            "experience_years": 0,
+            "education_level": "bachelors",
+            "job_match": {
+                "match_percentage": 60.0
+            },
+            "scoring_ready": true
+        }
+    }
+}

@@ -1,0 +1,32 @@
+[
+    {
+        "rank": 1,
+        "resume_id": "resume_006",
+        "filename": "Anjali_Deshmukh_Expert.txt",
+        "total_score": 95.0
+    },
+    {
+        "rank": 2,
+        "resume_id": "resume_003",
+        "filename": "Aryan_Sharma_Backend.txt",
+        "total_score": 80.26
+    },
+    {
+        "rank": 3,
+        "resume_id": "resume_004",
+        "filename": "Priya_Patil_Fullstack.txt",
+        "total_score": 76.58
+    },
+    {
+        "rank": 4,
+        "resume_id": "resume_007",
+        "filename": "Rahul_Verma_DataFocus.txt",
+        "total_score": 58.15
+    },
+    {
+        "rank": 5,
+        "resume_id": "resume_005",
+        "filename": "Kevin_Dsilva_Junior.txt",
+        "total_score": 47.1
+    }
+]

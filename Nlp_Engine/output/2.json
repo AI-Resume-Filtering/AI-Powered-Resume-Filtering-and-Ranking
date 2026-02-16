@@ -1,0 +1,147 @@
+{
+  "metadata": {
+    "request_id": "REQ_20260216_094500",
+    "processed_at": "2026-02-16T09:45:00.000000",
+    "total_resumes": 5,
+    "successfully_parsed": 5,
+    "failed": 0
+  },
+  "resumes": {
+    "resume_003": {
+      "resume_filename": "Aryan_Sharma_Backend.txt",
+      "sequential_id": "003",
+      "contact_info": {
+        "email": "aryan.sharma@email.com",
+        "phone": "+91 9822012345"
+      },
+      "skills": ["python", "java", "spring", "rest api", "sql", "mysql", "docker", "aws", "kubernetes", "git"],
+      "skill_categories": {
+        "programming_language": 2,
+        "backend": 3,
+        "database": 2,
+        "tools": 3
+      },
+      "experience_years": 4,
+      "education_level": "bachelors",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": ["python", "java", "spring", "rest api", "sql", "mysql", "git"],
+        "matched_preferred_skills": ["docker", "aws", "kubernetes", "rest api"],
+        "missing_required_skills": ["go", "r", "c", "mongodb", "react"],
+        "match_percentage": 78.94,
+        "experience_match": true,
+        "education_match": true
+      },
+      "scoring_ready": true
+    },
+    "resume_004": {
+      "resume_filename": "Priya_Patil_Fullstack.txt",
+      "sequential_id": "004",
+      "contact_info": {
+        "email": "priya.p@email.com",
+        "phone": "+91 8877665544"
+      },
+      "skills": ["python", "go", "react", "mongodb", "sql", "rest api", "git", "docker", "web3", "javascript"],
+      "skill_categories": {
+        "programming_language": 3,
+        "frontend": 2,
+        "database": 2,
+        "tools": 3
+      },
+      "experience_years": 2,
+      "education_level": "masters",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": ["python", "go", "react", "mongodb", "sql", "rest api", "git"],
+        "matched_preferred_skills": ["docker", "rest api", "web3"],
+        "missing_required_skills": ["java", "c", "r", "mysql", "spring"],
+        "match_percentage": 73.68,
+        "experience_match": true,
+        "education_match": true
+      },
+      "scoring_ready": true
+    },
+    "resume_005": {
+      "resume_filename": "Kevin_Dsilva_Junior.txt",
+      "sequential_id": "005",
+      "contact_info": {
+        "email": "kevin.dsilva@email.com",
+        "phone": "+91 7700991122"
+      },
+      "skills": ["java", "c", "sql", "html", "css", "git", "mysql"],
+      "skill_categories": {
+        "programming_language": 2,
+        "database": 2,
+        "frontend": 2,
+        "tools": 1
+      },
+      "experience_years": 0.5,
+      "education_level": "bachelors",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": ["java", "c", "sql", "mysql", "git"],
+        "matched_preferred_skills": ["c"],
+        "missing_required_skills": ["python", "go", "r", "mongodb", "spring", "react", "rest api"],
+        "match_percentage": 31.57,
+        "experience_match": false,
+        "education_match": true
+      },
+      "scoring_ready": true
+    },
+    "resume_006": {
+      "resume_filename": "Anjali_Deshmukh_Expert.txt",
+      "sequential_id": "006",
+      "contact_info": {
+        "email": "anjali.d@email.com",
+        "phone": "+91 9123456789"
+      },
+      "skills": ["python", "java", "c", "go", "r", "sql", "mysql", "mongodb", "spring", "react", "git", "rest api", "docker", "kubernetes", "aws", "web3"],
+      "skill_categories": {
+        "programming_language": 5,
+        "backend": 3,
+        "frontend": 1,
+        "database": 3,
+        "tools": 4
+      },
+      "experience_years": 6,
+      "education_level": "bachelors",
+      "job_match": {
+        "meets_requirements": true,
+        "matched_required_skills": ["python", "java", "c", "go", "r", "sql", "mysql", "mongodb", "spring", "react", "git", "rest api"],
+        "matched_preferred_skills": ["c", "r", "docker", "kubernetes", "aws", "rest api", "web3"],
+        "missing_required_skills": [],
+        "match_percentage": 100.0,
+        "experience_match": true,
+        "education_match": true
+      },
+      "scoring_ready": true
+    },
+    "resume_007": {
+      "resume_filename": "Rahul_Verma_DataFocus.txt",
+      "sequential_id": "007",
+      "contact_info": {
+        "email": "rahul.v@email.com",
+        "phone": "+91 9988774433"
+      },
+      "skills": ["python", "r", "sql", "mysql", "mongodb", "git", "pandas", "numpy", "aws"],
+      "skill_categories": {
+        "programming_language": 2,
+        "database": 3,
+        "tools": 2,
+        "data_science": 2
+      },
+      "experience_years": 2,
+      "education_level": "phd",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": ["python", "r", "sql", "mysql", "mongodb", "git"],
+        "matched_preferred_skills": ["r", "aws"],
+        "missing_required_skills": ["java", "c", "go", "spring", "react", "rest api"],
+        "match_percentage": 47.36,
+        "experience_match": true,
+        "education_match": true
+      },
+      "scoring_ready": true
+    }
+  }
+}
