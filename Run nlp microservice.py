@@ -53,20 +53,3 @@ if __name__ == "__main__":
         resume_paths=resume_files,
     )
 
-    # # Display results
-    # print("\n" + "=" * 70)
-    # print("📊 PROCESSING COMPLETE")
-    # print("=" * 70)
-    #
-    # if result["status"] == "success":
-    #     print(f"✅ Status: {result['status']}")
-    #     print(f"📝 Total Resumes: {result['total_resumes']}")
-    #     print(f"✅ Successfully Parsed: {result['successfully_parsed']}")
-    #     print(f"🎯 Qualified Candidates: {result['qualified_candidates']}")
-    #     print(f"📄 Output File: {result['output_file']}")
-    #     print("\n✅ READY FOR AI SCORING MODULE")
-    # else:
-    #     print(f"❌ Status: {result['status']}")
-    #     print(f"❌ Error: {result['error']}")
-    #
-    # print("=" * 70)

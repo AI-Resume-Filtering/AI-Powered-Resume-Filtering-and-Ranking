@@ -1,0 +1,13 @@
+Job Title: Data Scientist
+Required Skills:
+Python, Machine Learning, Deep Learning, TensorFlow, PyTorch, Pandas, NumPy, SQL, Data
+Analysis
+Preferred Skills:
+NLP, Computer Vision, AWS, Docker, Spark
+Minimum Experience: 3 years
+Education: Masters degree in Computer Science or Statistics
+Responsibilities:
+- Build machine learning models
+- Analyze large datasets
+- Develop predictive algorithms
+- Deploy ML models to production
