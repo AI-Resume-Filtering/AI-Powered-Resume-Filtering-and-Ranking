@@ -84,7 +84,7 @@ git clone https://github.com/yourusername/ai-resume-ranking.git
 pip install -r requirements.txt
 
 # Run the system
-python main.py --jd job_description.txt --resumes ./resumes_folder/
+python main.py --jd JD_001 --resumes ./resumes_folder/
 ```
 
 **That's it!** Get ranked results instantly.

@@ -47,7 +47,7 @@ ai_scoring/
 When you're done, someone should be able to:
 ```python
 #scorer = CandidateScorer()
-#result = scorer.score(candidate, job_requirements)
+#result = scorer.score(candidate, JD_001)
 # Get: Score: 87/100, Rank: 2, Reason: "Strong match, missing 1 skill"
 ```
 

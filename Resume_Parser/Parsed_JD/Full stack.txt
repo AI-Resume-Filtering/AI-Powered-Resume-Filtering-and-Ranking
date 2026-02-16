@@ -1,0 +1,12 @@
+Job Title: Full Stack Developer
+Required Skills:
+Python, Java, React, MySQL, MongoDB, Spring Boot, REST API, Git
+Preferred Skills:
+Docker, Kubernetes, AWS
+Minimum Experience: 2 years
+Education: Bachelors degree in Computer Science
+Responsibilities:
+- Develop web applications
+- Design REST APIs
+- Database management
+- Code reviews
