@@ -1,0 +1,116 @@
+{
+  "metadata": {
+    "request_id": "REQ_20260217_010939",
+    "processed_at": "2026-02-17T01:09:39.609428",
+    "total_resumes": 1,
+    "successfully_parsed": 1,
+    "failed": 0
+  },
+  "job_requirements": {
+    "job_title": "Full Stack Developer",
+    "required_skills": [
+      "python",
+      "java",
+      "c",
+      "go",
+      "r",
+      "sql",
+      "mysql",
+      "mongodb",
+      "spring",
+      "react",
+      "git",
+      "rest api"
+    ],
+    "preferred_skills": [
+      "c",
+      "r",
+      "docker",
+      "kubernetes",
+      "aws",
+      "rest api",
+      "web3"
+    ],
+    "minimum_experience": 2,
+    "required_education": "bachelors",
+    "responsibilities": [],
+    "total_requirements": 19
+  },
+  "resumes": {
+    "resume_001": {
+      "resume_filename": "resume_e8f79cd234814c4b95de1bd9db250989.txt",
+      "sequential_id": "001",
+      "contact_info": {
+        "email": "ughademayur67@gmail.com",
+        "phone": "+91) 7823029229"
+      },
+      "skills": [
+        "python",
+        "java",
+        "javascript",
+        "c",
+        "go",
+        "r",
+        "machine learning",
+        "deep learning",
+        "sql",
+        "mysql",
+        "mongodb",
+        "oracle",
+        "flask",
+        "spring",
+        "jsp",
+        "servlets",
+        "jdbc",
+        "html",
+        "typescript",
+        "git",
+        "github",
+        "pandas",
+        "numpy",
+        "matplotlib",
+        "rest api",
+        "web3"
+      ],
+      "skill_categories": {
+        "programming_language": 6,
+        "ai_ml": 5,
+        "database": 4,
+        "backend": 6,
+        "frontend": 2,
+        "tools": 3
+      },
+      "experience_years": 1,
+      "education_level": "masters",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": [
+          "spring",
+          "mongodb",
+          "c",
+          "java",
+          "go",
+          "sql",
+          "git",
+          "rest api",
+          "r",
+          "mysql",
+          "python"
+        ],
+        "matched_preferred_skills": [
+          "web3",
+          "rest api",
+          "r",
+          "c"
+        ],
+        "missing_required_skills": [
+          "react"
+        ],
+        "match_percentage": 91.67,
+        "experience_match": false,
+        "education_match": true
+      },
+      "scoring_ready": true
+    }
+  }
+}

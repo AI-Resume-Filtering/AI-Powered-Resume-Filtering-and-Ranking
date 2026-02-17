@@ -1,0 +1,185 @@
+    /* =========================
+   RESET
+========================= */
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    /* =========================
+   DASHBOARD CONTENT WRAPPER
+========================= */
+    
+    .history-wrapper {
+        margin-left: 0;
+        padding: 25px 20px;
+        min-height: 100vh;
+        color: white;
+        font-family: 'Rajdhani', sans-serif;
+        width: 100%;
+    }
+    
+    .history-title {
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        color: white;
+    }
+
+    .history-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .history-header select {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        background: rgba(11, 18, 32, 0.6);
+        color: #e0f7ff;
+    }
+    /* =========================
+   JOB CARDS
+========================= */
+    
+    .job-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .job-card {
+        background: rgba(0, 0, 0, 0.35);
+        padding: 20px 15px;
+        border-radius: 14px;
+        flex: 1 1 200px;
+        color: white;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .job-card h3 {
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+    
+    .job-card p {
+        margin-bottom: 6px;
+        font-size: 15px;
+    }
+    /* =========================
+   TABLE WRAPPER
+========================= */
+    
+    .table-wrapper {
+        background: rgba(0, 0, 0, 0.35);
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        margin-bottom: 40px;
+        overflow-x: auto;
+    }
+    /* =========================
+   HISTORY TABLE
+========================= */
+    
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    /* Table header */
+    
+    .history-table thead {
+        background: rgba(255, 255, 255, 0.08);
+        /* Dark header */
+        font-weight: 600;
+    }
+    
+    .history-table th,
+    .history-table td {
+        padding: 16px 18px;
+        text-align: left;
+        color: white;
+    }
+    /* Table body rows */
+    
+    .history-table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.2s;
+    }
+    
+    .history-table tbody tr:hover {
+        background: rgba(30, 58, 138, 0.5);
+        /* Hover blue */
+    }
+    /* Empty / Loading State */
+    
+    .history-table tbody tr td[colspan] {
+        text-align: center;
+        color: #cbd5e1;
+        font-style: italic;
+    }
+    /* =========================
+   STATUS BADGES
+========================= */
+    
+    .selected {
+        background: #2ecc71;
+        color: black;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    
+    .pending {
+        background: #f1c40f;
+        color: black;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    
+    .rejected {
+        background: #e74c3c;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    /* =========================
+   LATEST RESUMES BOX
+========================= */
+    
+    .latest-resumes {
+        margin-bottom: 30px;
+    }
+    
+    .resume-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .resume-card {
+        background: rgba(0, 0, 0, 0.35);
+        padding: 15px 12px;
+        border-radius: 12px;
+        flex: 1 1 200px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .resume-card p {
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+    
+    .resume-card a {
+        color: #60a5fa;
+        text-decoration: none;
+        font-weight: 500;
+    }

@@ -1,0 +1,116 @@
+{
+  "metadata": {
+    "request_id": "REQ_20260217_022210",
+    "processed_at": "2026-02-17T02:22:10.751465",
+    "total_resumes": 1,
+    "successfully_parsed": 1,
+    "failed": 0
+  },
+  "job_requirements": {
+    "job_title": "Data Scientist",
+    "required_skills": [
+      "python",
+      "c",
+      "r",
+      "machine learning",
+      "deep learning",
+      "tensorflow",
+      "pytorch",
+      "sql",
+      "pandas",
+      "numpy"
+    ],
+    "preferred_skills": [
+      "c",
+      "go",
+      "r",
+      "machine learning",
+      "natural language processing",
+      "nlp",
+      "computer vision",
+      "typescript",
+      "docker",
+      "aws"
+    ],
+    "minimum_experience": 3,
+    "required_education": "bachelors",
+    "responsibilities": [],
+    "total_requirements": 20
+  },
+  "resumes": {
+    "resume_001": {
+      "resume_filename": "resume_fd1fdb4b23f5488d870645ca34db944d.txt",
+      "sequential_id": "001",
+      "contact_info": {
+        "email": "ughademayur67@gmail.com",
+        "phone": "+91) 7823029229"
+      },
+      "skills": [
+        "python",
+        "java",
+        "javascript",
+        "c",
+        "go",
+        "r",
+        "machine learning",
+        "deep learning",
+        "sql",
+        "mysql",
+        "mongodb",
+        "oracle",
+        "flask",
+        "spring",
+        "jsp",
+        "servlets",
+        "jdbc",
+        "html",
+        "typescript",
+        "git",
+        "github",
+        "pandas",
+        "numpy",
+        "matplotlib",
+        "rest api",
+        "web3"
+      ],
+      "skill_categories": {
+        "programming_language": 6,
+        "ai_ml": 5,
+        "database": 4,
+        "backend": 6,
+        "frontend": 2,
+        "tools": 3
+      },
+      "experience_years": 1,
+      "education_level": "masters",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": [
+          "c",
+          "machine learning",
+          "python",
+          "r",
+          "numpy",
+          "deep learning",
+          "sql",
+          "pandas"
+        ],
+        "matched_preferred_skills": [
+          "c",
+          "machine learning",
+          "typescript",
+          "r",
+          "go"
+        ],
+        "missing_required_skills": [
+          "tensorflow",
+          "pytorch"
+        ],
+        "match_percentage": 80.0,
+        "experience_match": false,
+        "education_match": true
+      },
+      "scoring_ready": true
+    }
+  }
+}

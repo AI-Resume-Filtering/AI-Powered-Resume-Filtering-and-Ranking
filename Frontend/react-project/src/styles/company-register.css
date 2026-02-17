@@ -1,0 +1,106 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Rajdhani', 'Orbitron', monospace, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: 
+        radial-gradient(ellipse at center, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at bottom, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #0B1220 0%, #0E1A2B 50%, #1a2638 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.register-box {
+    width: 420px;
+    background: 
+        linear-gradient(135deg, rgba(0, 255, 255, 0.04) 0%, transparent 100%),
+        linear-gradient(135deg, #0B1220 0%, #152638 100%);
+    color: #e0f7ff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.2), 
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: #1f6feb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1a5fd0;
+}
+
+.msg {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 14px;
+    display: none;
+}
+
+.error {
+    color: #ff7675;
+}
+
+.success {
+    color: #2ecc71;
+}
+
+.login-link {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #74ebd5;
+    text-decoration: none;
+    font-weight: 600;
+}

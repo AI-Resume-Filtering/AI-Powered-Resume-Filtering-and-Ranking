@@ -1,0 +1,145 @@
+/* Table wrapper panel */
+
+.table-wrapper {
+    background: rgba(0, 0, 0, 0.35);
+    /* Panel background */
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* Table general */
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+
+/* Table header */
+
+.history-table thead {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    /* Dark header */
+    color: white;
+    font-weight: 600;
+}
+
+
+/* Table cells with more spacing */
+
+.history-table th,
+.history-table td {
+    padding: 28px 40px;
+    /* Increased spacing */
+    text-align: left;
+    background: transparent;
+    /* Rows transparent */
+    color: rgb(255, 255, 255);
+    /* Default row text color */
+}
+
+
+/* Candidate Name gradient */
+
+.history-table td:nth-child(1) {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+
+/* Row hover */
+
+.history-table tbody tr:hover {
+    background: rgba(30, 58, 138, 0.5);
+    /* Slight blue highlight on hover */
+}
+
+
+/* Row border */
+
+.history-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+/* Status badges */
+
+.selected {
+    background: #2ecc71;
+    color: black;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.pending {
+    background: #f1c40f;
+    color: black;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.rejected {
+    background: #e74c3c;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+
+/* Uploaded resumes section - remove white box */
+
+.section {
+    background: transparent;
+    /* Remove white box */
+    padding: 0;
+    width: 100%;
+}
+
+
+/* Section title */
+
+.section h2 {
+    margin-bottom: 20px;
+    color: white;
+    font-size: 24px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.section-actions select {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    background: rgba(11, 18, 32, 0.6);
+    color: #e0f7ff;
+}
+
+.section-actions .secondary {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    background: rgba(11, 18, 32, 0.6);
+    color: #e0f7ff;
+    cursor: pointer;
+}

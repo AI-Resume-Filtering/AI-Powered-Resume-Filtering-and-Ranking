@@ -1,0 +1,211 @@
+/* =========================
+   DELETE JOB PAGE
+========================= */
+
+.delete-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 30px 28px;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
+    color: white;
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+.delete-card h2 {
+    font-size: 22px;
+    margin-bottom: 25px;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+/* =========================
+   LABELS & SELECTS
+========================= */
+
+.delete-card label {
+    display: block;
+    text-align: left;
+    font-size: 14px;
+    color: #e2e8f0;
+    margin: 15px 0 8px;
+    font-weight: 500;
+}
+
+.delete-card select {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    outline: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.delete-card select:focus {
+    border-color: rgba(37, 99, 235, 0.5);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}
+
+.delete-card select option {
+    background: #1e293b;
+    color: white;
+}
+
+
+/* =========================
+   INPUT
+========================= */
+
+.delete-card input[type="text"] {
+    width: 100%;
+    padding: 14px 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    font-size: 15px;
+}
+
+.delete-card input::placeholder {
+    color: #cbd5e1;
+}
+
+
+/* =========================
+   ERROR MESSAGE
+========================= */
+
+.error-msg {
+    background: rgba(220, 38, 38, 0.2);
+    border-left: 4px solid #dc2626;
+    color: #fca5a5;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.success-msg {
+    background: rgba(34, 197, 94, 0.2);
+    border-left: 4px solid #22c55e;
+    color: #86efac;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+
+/* =========================
+   JOB DETAILS
+========================= */
+
+.job-details {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    text-align: left;
+}
+
+.job-details p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.job-details strong {
+    color: #60a5fa;
+}
+
+
+
+/* =========================
+   OR TEXT
+========================= */
+
+.delete-card p {
+    margin: 12px 0;
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+
+/* =========================
+   FILE UPLOAD
+========================= */
+
+.file-label {
+    display: block;
+    margin: 15px 0 8px;
+    font-size: 14px;
+    color: #93c5fd;
+    text-align: left;
+}
+
+.delete-card input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #cbd5e1;
+    cursor: pointer;
+}
+
+
+/* Selected file name */
+
+.file-name {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #a5b4fc;
+    text-align: left;
+}
+
+
+/* =========================
+   DELETE BUTTON
+========================= */
+
+.primary {
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
+}
+
+button.primary {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}

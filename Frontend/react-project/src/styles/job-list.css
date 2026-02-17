@@ -1,0 +1,192 @@
+/* ============================= */
+
+
+/* Page & Reset */
+
+
+/* ============================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1px;
+    /* 👈 Box thoda top la */
+    padding-bottom: 60px;
+}
+
+
+/* Page Title */
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+
+/* ============================= */
+
+
+/* Container like addcase */
+
+
+/* ============================= */
+
+.addcase {
+    width: 700px;
+    max-width: 95%;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    border-radius: 10px;
+    border-top: 6px solid #1f6feb;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    /* 👈 extra top spacing */
+}
+
+
+/* Back button */
+
+.back-btn {
+    padding: 12px 22px;
+    background-color: #34495e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    align-self: flex-start;
+    margin-bottom: 15px;
+}
+
+.back-btn:hover {
+    background-color: #2c3e50;
+    transform: translateY(-2px);
+}
+
+
+/* ============================= */
+
+
+/* Job card styling */
+
+
+/* ============================= */
+
+#jobList {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+
+/* Card */
+
+.job-card {
+    background-color: #34495e;
+    color: #ecf0f1;
+    padding: 20px;
+    border-radius: 10px;
+    border-top: 4px solid #1f6feb;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
+    transition: transform 0.25s, box-shadow 0.25s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.job-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.job-card b {
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.job-card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+
+/* Apply Button */
+
+.job-card button {
+    margin-top: 12px;
+    padding: 10px 18px;
+    background-color: #1f6feb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.job-card button:hover {
+    background-color: #2563eb;
+    transform: scale(1.05);
+}
+
+
+/* ============================= */
+
+
+/* Responsive */
+
+
+/* ============================= */
+
+@media (max-width: 800px) {
+    .addcase {
+        width: 95%;
+        padding: 20px;
+        gap: 15px;
+    }
+    #jobList {
+        gap: 15px;
+    }
+    .job-card button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 500px) {
+    h2 {
+        font-size: 20px;
+    }
+    .job-card {
+        padding: 16px;
+    }
+    .job-card b {
+        font-size: 18px;
+    }
+    .job-card p {
+        font-size: 13px;
+    }
+}
