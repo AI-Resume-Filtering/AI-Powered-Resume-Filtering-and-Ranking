@@ -1,6 +1,6 @@
 """
-Batch Resume Processor - UPDATED
-Now parses Job Description first, then compares resumes
+Batch Resume Processor
+Parses job description and compares resumes against requirements
 """
 
 import os
@@ -31,35 +31,25 @@ from .output_formatter import format_resume_data, format_error_resume
 
 class NLPBatchProcessor:
     """
-    Batch processor for multiple resumes
-    NOW: Parses JD first, then matches resumes against it
+    Processes multiple resumes and compares against job requirements
     """
 
     def __init__(self, input_folder=None, output_file=None, jd_file=None):
         """
-        Initialize batch processor
-
-        Args:
-            input_folder: Where to read resumes from
-            output_file: Where to save results
-            jd_file: Job description file path
+        Initialize with input/output paths
         """
         self.input_folder = input_folder or INPUT_FOLDER
         self.output_file = output_file or OUTPUT_FILE
         self.jd_file = jd_file or JOB_DESCRIPTION_FILE
 
-        # Create output directory
+        # Setup output directory and initialize tracking
         Path(os.path.dirname(self.output_file)).mkdir(parents=True, exist_ok=True)
-
-        # Job requirements (will be parsed from JD file)
         self.job_requirements = None
-
-        # Statistics
         self.stats = {
             "total": 0,
             "success": 0,
             "failed": 0,
-            "qualified": 0,  # NEW: Count who meet requirements
+            "qualified": 0,
             "errors": []
         }
 
@@ -73,11 +63,7 @@ class NLPBatchProcessor:
 
     def process_folder(self):
         """
-        Process all resumes in input folder
-
-        NEW FLOW:
-        1. Parse job description first
-        2. Process all resumes
+        Main pipeline: parse JD then process all resumes
         3. Compare each resume with JD
         4. Rank by match percentage
         """
@@ -99,10 +85,10 @@ class NLPBatchProcessor:
         print(f"✅ Min Experience: {self.job_requirements['minimum_experience']} years")
         print(f"✅ Education: {self.job_requirements['required_education']}")
 
-        # STEP 2: Get all resume files
-        print("\n" + "="*70)
-        print("STEP 2: PROCESSING RESUMES")
-        print("="*70 + "\n")
+        # Get all resume files and start processing
+        print("\n" + "=" * 70)
+        print("Processing resumes")
+        print("=" * 70)
 
         resume_files = self._get_resume_files()
 
@@ -113,7 +99,7 @@ class NLPBatchProcessor:
         print(f"📊 Found {len(resume_files)} resume files")
         print(f"🔄 Starting processing...\n")
 
-        # STEP 3: Process with progress bar
+        # Process each resume with progress tracking
         results = {}
 
         with tqdm(total=len(resume_files), desc="Processing Resumes", ncols=100) as pbar:
@@ -150,10 +136,10 @@ class NLPBatchProcessor:
                     self.stats["total"] += 1
                     pbar.update(1)
 
-        # STEP 4: Rank results by match percentage
+        # Sort by match score
         ranked_results = self._rank_resumes(results)
 
-        # STEP 5: Save results
+        # Save results and statistics
         output_path = self._save_results(ranked_results)
 
         # Save errors
@@ -293,7 +279,7 @@ class NLPBatchProcessor:
                 "processed_at": datetime.now().isoformat(),
                 "input_folder": self.input_folder
             },
-            "JD_001": self.job_requirements,  # NEW: Include JD in output
+            "job_requirements": self.job_requirements,
             "resumes": results
         }
 

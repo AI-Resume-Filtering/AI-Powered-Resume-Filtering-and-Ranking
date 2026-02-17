@@ -57,16 +57,14 @@ class NLPMicroservice:
         print(f"{'='*70}")
 
         try:
-            # Step 1: Parse JD
+            # Parse job description first
             jd_data = self._parse_job_description(jd_path)
             if not jd_data:
                 return self._error_response("Failed to parse job description")
 
-            # Step 2: Process all resumes (extract data only)
+            # Process each resume
             results = {}
             stats = {"total": 0, "success": 0, "failed": 0}
-
-            print(f"\n📄 Processing {len(resume_paths)} resumes...")
 
             for idx, resume_path in enumerate(resume_paths, 1):
                 resume_id = f"resume_{str(idx).zfill(3)}"
@@ -79,8 +77,7 @@ class NLPMicroservice:
                     )
                     results[resume_id] = resume_data
                     stats["success"] += 1
-                    print(f"  ✅ {resume_id}: {resume_data['resume_filename']}")
-
+                    
                 except Exception as e:
                     results[resume_id] = self._create_error_resume(
                         resume_id,
@@ -88,14 +85,11 @@ class NLPMicroservice:
                         str(e)
                     )
                     stats["failed"] += 1
-                    print(f"  ❌ {resume_id}: Error - {str(e)}")
 
                 stats["total"] += 1
 
-            # Step 3: Save extracted data (NO RANKING)
+            # Save results and return response
             output_file = self._save_output(request_id, jd_data, results, stats)
-
-            # Step 4: Return minimal response
             return self._create_response(request_id, stats, output_file)
 
         except Exception as e:

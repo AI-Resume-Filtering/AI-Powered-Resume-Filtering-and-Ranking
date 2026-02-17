@@ -30,7 +30,7 @@ __all__ = [
     'JOB_DESCRIPTION_FILE'
 ]
 
-__version__ = '2.0.0'  # Updated for microservice support
+__version__ = '2.0.0'
 __author__ = 'Mahesh Nikas'
 
 print("✓ NLP Engine Loaded (Batch + Microservice Mode)")

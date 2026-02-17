@@ -8,52 +8,32 @@ import re
 
 def normalize_text(text: str) -> str:
     """
-    Normalize resume text
-
-    Steps:
-    1. Replace bullets with newlines
-    2. Fix encoding issues
-    3. Normalize whitespace
-    4. Remove extra line breaks
-
-    Args:
-        text: Raw resume text
-
-    Returns:
-        Cleaned, normalized text
+    Clean and standardize text for parsing
     """
     if not text:
         return ""
 
-    # Step 1: Replace all bullet types with newlines
+    # Replace bullets and format characters
     bullet_chars = ["•", "➢", "○", "●", "■", "□", "▪", "▫", "→", "➤", "⦿", "⦾"]
     for bullet in bullet_chars:
         text = text.replace(bullet, "\n")
 
-    # Step 2: Fix line endings
-    text = re.sub(r'\r\n', '\n', text)  # Windows → Unix
-    text = re.sub(r'\r', '\n', text)     # Old Mac → Unix
-    text = re.sub(r'\n+', '\n', text)    # Multiple → Single
+    # Normalize line endings
+    text = re.sub(r'\r\n', '\n', text)
+    text = re.sub(r'\r', '\n', text)
+    text = re.sub(r'\n+', '\n', text)
 
-    # Step 3: Fix encoding issues (PDF artifacts)
+    # Fix common PDF encoding issues
     encoding_fixes = {
-        'â€"': '-',   # Em dash
-        'â€"': '-',   # En dash
-        'â€™': "'",   # Apostrophe
-        'â€œ': '"',   # Opening quote
-        'â€�': '"',   # Closing quote
-        'â€¢': '-',   # Bullet
-        'Ã¢â‚¬"': '-',
-        'Ã¢â‚¬â„¢': "'",
+        'â€"': '-', 'â€"': '-', 'â€™': "'", 'â€œ': '"',
+        'â€�': '"', 'â€¢': '-', 'Ã¢â‚¬"': '-', 'Ã¢â‚¬â„¢': "'",
     }
     for old, new in encoding_fixes.items():
         text = text.replace(old, new)
 
-    # Step 4: Normalize whitespace
-    text = re.sub(r'\t', ' ', text)     # Tabs → Spaces
-    text = re.sub(r' +', ' ', text)     # Multiple spaces → Single
-
-    # Step 5: Clean up lines
+    # Normalize spacing and clean lines
+    text = re.sub(r'\t', ' ', text)
+    text = re.sub(r' +', ' ', text)
     lines = text.split('\n')
     cleaned_lines = [line.strip() for line in lines if line.strip()]
 

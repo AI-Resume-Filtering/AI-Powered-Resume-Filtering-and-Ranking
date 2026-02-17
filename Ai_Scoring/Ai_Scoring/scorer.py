@@ -1,8 +1,7 @@
-# Ai_Scoring/scorer.py
+# AI Scoring Module
 import os
 import json
 
-# --- IMPORTS (Handles Local & Package modes) ---
 try:
     from .config import SCORING_PROFILES, EDUCATION_RANKING, EXP_THRESHOLDS
     from .utils import parse_education_level, standardize_resume_data
@@ -10,13 +9,9 @@ except ImportError:
     from config import SCORING_PROFILES, EDUCATION_RANKING, EXP_THRESHOLDS
     from utils import parse_education_level, standardize_resume_data
 
-
-# -----------------------------------------------
-
 def get_adaptive_weights(job_reqs: dict) -> dict:
     """
-    Returns the scoring profile (Fresher vs Senior) based on
-    the job's minimum experience requirement.
+    Select scoring weights based on job requirements
     """
     req_exp = job_reqs.get("minimum_experience", 0)
 
@@ -30,23 +25,18 @@ def get_adaptive_weights(job_reqs: dict) -> dict:
 
 def score_resume(resume_raw: dict, metadata: dict) -> float:
     """
-    Calculates the score for a single resume.
+    Calculate total score for a resume
     """
-    # 1. STANDARDIZE INPUT (Fixes messy data instantly)
+    # Standardize and extract data
     resume = standardize_resume_data(resume_raw)
-
-    # 2. EXTRACT JOB REQUIREMENTS
-    # Handles if metadata is the full object OR just the requirements dict
     job_reqs = metadata.get("job_requirements", metadata)
-
-    # 3. GET DYNAMIC WEIGHTS
     weights = get_adaptive_weights(job_reqs)
 
-    # --- METRIC 1: Skill Match ---
+    # Calculate weighted scores
     match_pct = resume.get("job_match", {}).get("match_percentage", 0)
     skill_score = (match_pct / 100) * weights["skill_match"]
 
-    # --- METRIC 2: Experience ---
+    # Experience scoring
     years = resume.get("experience_years", 0)
     req_exp = job_reqs.get("minimum_experience", 0)
 

@@ -1,6 +1,6 @@
 """
-Output Formatter - UPDATED
-Now uses ONLY parsed job description (no defaults)
+Output Formatter
+Formats extracted data for AI scoring
 """
 
 from typing import Dict
@@ -13,13 +13,10 @@ def format_resume_data(
     skills_data: dict,
     experience_years: int,
     education_level: str,
-    job_requirements: dict  # Now REQUIRED (no default)
+    job_requirements: dict
 ) -> dict:
     """
-    Format all extracted data into scoring-ready structure
-
-    Args:
-        job_requirements: MUST be provided (parsed from JD)
+    Format extracted data into scoring-ready structure
     """
 
     # Calculate job match
