@@ -55,6 +55,71 @@ def calculate_experience_years(text: str) -> int:
     return min(count, 10)  # Cap at 10 years
 
 
+def calculate_skill_experience(text: str, skills_list: list) -> dict:
+    """
+    Calculate experience per skill
+
+    Returns:
+        {"python": 2.0, "java": 1.5, "react": 0.5}  # in years
+    """
+    skill_experience = {}
+    text_lower = text.lower()
+
+    for skill in skills_list:
+        skill_lower = skill.lower()
+        years = 0.0
+
+        # Method 1: Explicit mention - "Python (2 years)" or "Python - 3 years"
+        patterns = [
+            rf'{skill_lower}\s*[\(\-:]\s*(\d+\.?\d*)\s*(?:year|yr)s?',
+            rf'(\d+\.?\d*)\s*(?:year|yr)s?\s+(?:of\s+)?{skill_lower}',
+            rf'{skill_lower}.*?(\d+\.?\d*)\s*(?:year|yr)s?',
+        ]
+
+        for pattern in patterns:
+            matches = re.findall(pattern, text_lower)
+            if matches:
+                years = max(float(m) for m in matches)
+                break
+
+        # Method 2: Month patterns - "Python (6 months)"
+        if years == 0:
+            month_patterns = [
+                rf'{skill_lower}\s*[\(\-:]\s*(\d+)\s*months?',
+                rf'(\d+)\s*months?\s+(?:of\s+)?{skill_lower}',
+            ]
+
+            for pattern in month_patterns:
+                matches = re.findall(pattern, text_lower)
+                if matches:
+                    years = max(int(m) / 12.0 for m in matches)
+                    break
+
+        # Method 3: Estimate from job dates (if skill mentioned in experience)
+        if years == 0 and skill_lower in text_lower:
+            # Find all year ranges in text
+            date_ranges = re.findall(r'(\d{4})\s*[-–]\s*(\d{4}|present|current)', text_lower)
+
+            if date_ranges:
+                # Check if skill is near any date range (within 200 chars)
+                skill_positions = [m.start() for m in re.finditer(skill_lower, text_lower)]
+
+                for start_year, end_year in date_ranges:
+                    # Calculate years
+                    start = int(start_year)
+                    end = datetime.now().year if end_year in ['present', 'current'] else int(end_year)
+                    duration = end - start
+
+                    # Use this duration if skill is mentioned
+                    if duration > 0:
+                        years = max(years, duration)
+
+        if years > 0:
+            skill_experience[skill] = round(years, 1)
+
+    return skill_experience
+
+
 # Quick test
 if __name__ == "__main__":
     test_text = """

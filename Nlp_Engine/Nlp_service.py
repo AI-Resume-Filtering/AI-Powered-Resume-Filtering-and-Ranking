@@ -125,7 +125,7 @@ class NLPMicroservice:
         from .section_detector import detect_sections, get_section_text
         from .contact_extractor import extract_contact_info
         from .skill_extractor import extract_skills
-        from .experience_calculator import calculate_experience_years
+        from .experience_calculator import calculate_experience_years, calculate_skill_experience
         from .education_detector import detect_education_level
         from .output_formatter import format_resume_data
 
@@ -140,12 +140,21 @@ class NLPMicroservice:
         sections = detect_sections(normalized)
         contact_info = extract_contact_info(normalized)
 
+        # Extract skills
         skills_text = get_section_text(sections, "skills") + "\n" + get_section_text(sections, "projects")
         skills_data = extract_skills(skills_text)
 
+        # Extract experience
         experience_text = get_section_text(sections, "experience")
         experience_years = calculate_experience_years(experience_text)
 
+        # NEW: Calculate skill-wise experience
+        skills_data["skill_experience"] = calculate_skill_experience(
+            experience_text,
+            skills_data["skills_list"]
+        )
+
+        # Extract education
         education_text = get_section_text(sections, "education")
         education_level = detect_education_level(education_text)
 
@@ -212,6 +221,7 @@ class NLPMicroservice:
             "skills": [],
             "skill_categories": {},
             "experience_years": 0,
+            "skill_experience": {},
             "education_level": "unknown",
             "job_match": {
                 "meets_requirements": False,
@@ -239,29 +249,6 @@ class NLPMicroservice:
 # ============================================
 
 def process_resumes(jd_path: str, resume_paths: List[str]) -> Dict:
-    """
-    Extract data from resumes (NO RANKING)
 
-    Args:
-        jd_path: Path to job description file
-        resume_paths: List of resume file paths
-
-    Returns:
-        {
-            "success": True,
-            "request_id": "REQ_xxx",
-            "total_resumes": 5,
-            "successfully_parsed": 5,
-            "output_path": "Nlp_Engine/output/xxx.json",
-            "message": "Data extracted. Ready for AI Scoring."
-        }
-
-    Usage:
-        result = process_resumes(jd_path, resume_paths)
-
-        if result["success"]:
-            # Pass to AI Scoring Module
-            ai_module.score_and_rank(result["output_path"])
-    """
     service = NLPMicroservice()
     return service.process_request(jd_path, resume_paths)
