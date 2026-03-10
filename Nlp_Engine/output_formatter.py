@@ -40,7 +40,6 @@ def format_resume_data(
         "scoring_ready": True
     }
 
-
 def calculate_job_match(
     skills_data: dict,
     experience_years: int,
