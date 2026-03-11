@@ -12,7 +12,7 @@ from tqdm import tqdm
 from .config import (
     INPUT_FOLDER,
     OUTPUT_FILE,
-    JOB_DESCRIPTION_FILE,  # NEW
+    JOB_DESCRIPTION_FILE,
     RESUME_ID_PREFIX,
     ID_PADDING,
     CONTINUE_ON_ERROR,
@@ -23,9 +23,9 @@ from .text_normalizer import normalize_text
 from .section_detector import detect_sections, get_section_text
 from .contact_extractor import extract_contact_info
 from .skill_extractor import extract_skills
-from .experience_calculator import calculate_experience_years
+from .experience_calculator import calculate_experience_years, calculate_skill_experience
 from .education_detector import detect_education_level
-from .job_description_parser import parse_job_description  # NEW
+from .job_description_parser import parse_job_description
 from .output_formatter import format_resume_data, format_error_resume
 
 
@@ -64,8 +64,6 @@ class NLPBatchProcessor:
     def process_folder(self):
         """
         Main pipeline: parse JD then process all resumes
-        3. Compare each resume with JD
-        4. Rank by match percentage
         """
 
         # STEP 1: Parse Job Description
@@ -85,9 +83,9 @@ class NLPBatchProcessor:
         print(f"✅ Min Experience: {self.job_requirements['minimum_experience']} years")
         print(f"✅ Education: {self.job_requirements['required_education']}")
 
-        # Get all resume files and start processing
+        # STEP 2: Get all resume files and start processing
         print("\n" + "=" * 70)
-        print("Processing resumes")
+        print("STEP 2: PROCESSING RESUMES")
         print("=" * 70)
 
         resume_files = self._get_resume_files()
@@ -213,6 +211,12 @@ class NLPBatchProcessor:
         experience_text = get_section_text(sections, "experience")
         experience_years = calculate_experience_years(experience_text)
 
+        # NEW: Calculate skill-wise experience
+        skills_data["skill_experience"] = calculate_skill_experience(
+            experience_text,
+            skills_data["skills_list"]
+        )
+
         # Step 6: Detect education
         education_text = get_section_text(sections, "education")
         education_level = detect_education_level(education_text)
@@ -233,10 +237,6 @@ class NLPBatchProcessor:
     def _rank_resumes(self, results: dict) -> dict:
         """
         Rank resumes by match percentage
-
-        Order:
-        1. Qualified candidates (meet all requirements) - sorted by match %
-        2. Non-qualified candidates - sorted by match %
         """
         qualified = {}
         not_qualified = {}
@@ -248,7 +248,7 @@ class NLPBatchProcessor:
                 else:
                     not_qualified[resume_id] = data
             else:
-                not_qualified[resume_id] = data  # Errors go to bottom
+                not_qualified[resume_id] = data
 
         # Sort by match percentage
         qualified_sorted = dict(sorted(
@@ -275,7 +275,7 @@ class NLPBatchProcessor:
                 "total_resumes": self.stats["total"],
                 "successfully_parsed": self.stats["success"],
                 "failed": self.stats["failed"],
-                "qualified_candidates": self.stats["qualified"],  # NEW
+                "qualified_candidates": self.stats["qualified"],
                 "processed_at": datetime.now().isoformat(),
                 "input_folder": self.input_folder
             },
@@ -301,9 +301,9 @@ class NLPBatchProcessor:
         print(f"Total Resumes: {self.stats['total']}")
         print(f"✅ Success: {self.stats['success']}")
         print(f"❌ Failed: {self.stats['failed']}")
-        print(f"🎯 Qualified: {self.stats['qualified']}")  # NEW
+        print(f"🎯 Qualified: {self.stats['qualified']}")
         print(f"📈 Success Rate: {(self.stats['success']/self.stats['total']*100):.1f}%")
-        print(f"🎯 Qualification Rate: {(self.stats['qualified']/self.stats['success']*100):.1f}%")  # NEW
+        print(f"🎯 Qualification Rate: {(self.stats['qualified']/self.stats['success']*100):.1f}%")
         print(f"\n💾 Output saved to: {self.output_file}")
 
         if self.stats["errors"]:

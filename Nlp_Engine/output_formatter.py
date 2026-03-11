@@ -30,19 +30,13 @@ def format_resume_data(
     return {
         "resume_filename": filename,
         "sequential_id": resume_id.split('_')[-1],
-
         "contact_info": contact_info,
-
         "skills": skills_data["skills_list"],
-
         "skill_categories": skills_data["skills_by_category"],
-
         "experience_years": experience_years,
-
+        "skill_experience": skills_data.get("skill_experience", {}),  # NEW LINE
         "education_level": education_level,
-
         "job_match": job_match,
-
         "scoring_ready": True
     }
 
