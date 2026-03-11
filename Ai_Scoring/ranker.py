@@ -74,18 +74,17 @@ def process_ranking():
                 "total_score": score
             })
 
-    # Sort High to Low
-    scored_results.sort(key=lambda x: x["total_score"], reverse=True)
+    # Sort High to Low 
+    # Cascading Sort: Primary is Total Score, Secondary is raw experience from the JSON
+    scored_results.sort(
+        key=lambda x: (x["total_score"], resumes[x["resume_id"]].get("experience_years", 0)), 
+        reverse=True
+    )
 
-    # --- TIE-BREAKER FIX (Dense Ranking / Finite Declaration) ---
-    current_rank = 1
-    for i in range(len(scored_results)):
-        # If not the first item, and score is strictly lower, increment rank
-        if i > 0 and scored_results[i]["total_score"] < scored_results[i-1]["total_score"]:
-            current_rank += 1
-            
-        scored_results[i]["rank"] = current_rank
-    # ------------------------------------------------------------
+    # --- STRICT RANKING (Finite/Unique Declaration) ---
+    for idx, item in enumerate(scored_results, 1):
+        item["rank"] = idx
+    # --------------------------------------------------
 
     # Save
     output_path = os.path.join(current_dir, "ranked_candidates.json")
