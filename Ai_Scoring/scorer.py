@@ -9,14 +9,12 @@ try:
 except ImportError:
     from config import SCORING_PROFILES, EDUCATION_RANKING, EXP_THRESHOLDS
     from utils import parse_education_level, standardize_resume_data
-
-
 # -----------------------------------------------
 
 def get_adaptive_weights(job_reqs: dict) -> dict:
     """
-    Returns the scoring profile (Fresher vs Senior) based on
-    the job's minimum experience requirement.
+    Select scoring weights based on job requirements.
+    Shifts focus between Skills and Experience based on seniority.
     """
     req_exp = job_reqs.get("minimum_experience", 0)
 
@@ -27,19 +25,13 @@ def get_adaptive_weights(job_reqs: dict) -> dict:
     else:
         return SCORING_PROFILES["MID_LEVEL"]
 
-
 def score_resume(resume_raw: dict, metadata: dict) -> float:
     """
-    Calculates the score for a single resume.
+    Calculate the total Weighted Score for a single resume.
     """
-    # 1. STANDARDIZE INPUT (Fixes messy data instantly)
+    # 1. Standardize and extract data
     resume = standardize_resume_data(resume_raw)
-
-    # 2. EXTRACT JOB REQUIREMENTS
-    # Handles if metadata is the full object OR just the requirements dict
     job_reqs = metadata.get("job_requirements", metadata)
-
-    # 3. GET DYNAMIC WEIGHTS
     weights = get_adaptive_weights(job_reqs)
 
     # --- METRIC 1: Skill Match ---
@@ -76,7 +68,7 @@ def score_resume(resume_raw: dict, metadata: dict) -> float:
     pref_list = job_reqs.get("preferred_skills", [])
     cand_skills = resume.get("skills", [])
 
-    # Find common skills
+    # Find common skills via Set Intersection
     matched_pref = set(pref_list) & set(cand_skills)
 
     # 2 points per preferred skill, capped at the max weight
@@ -92,18 +84,21 @@ def score_resume(resume_raw: dict, metadata: dict) -> float:
 # ==========================================================
 def process_resume_batch(filename: str, backend_metadata: dict) -> list:
     """
-    This function is the API endpoint logic.
-    1. Finds the NLP file in 'Nlp_Engine/output'
-    2. Scores every resume using the provided metadata
-    3. Returns a sorted list of results
+    API endpoint logic for backend integration.
     """
-
-    # 1. Locate the file
+    # 1. Locate the file with bulletproof pathing
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(current_dir)
-    nlp_path = os.path.join(project_root, "Nlp_Engine", "output", filename)
+    repo_root = os.path.dirname(os.path.dirname(current_dir))
 
-    if not os.path.exists(nlp_path):
+    candidate_paths = []
+    if os.path.isabs(filename):
+        candidate_paths.append(filename)
+
+    candidate_paths.append(os.path.join(repo_root, "Nlp_Engine", "output", filename))
+    candidate_paths.append(os.path.join(repo_root, filename))
+
+    nlp_path = next((path for path in candidate_paths if os.path.exists(path)), None)
+    if not nlp_path:
         return [{"error": f"File not found: {filename}"}]
 
     try:
@@ -118,10 +113,8 @@ def process_resume_batch(filename: str, backend_metadata: dict) -> list:
     # 2. Score Loop
     for res_id, res_data in resumes.items():
         if res_data.get("scoring_ready", False):
-            # Use our standardized scoring function
             final_score = score_resume(res_data, backend_metadata)
 
-            # Prepare clean output for Frontend
             results.append({
                 "resume_id": res_id,
                 "filename": res_data.get("resume_filename", "Unknown"),
@@ -136,8 +129,13 @@ def process_resume_batch(filename: str, backend_metadata: dict) -> list:
     # 3. Sort (High to Low)
     results.sort(key=lambda x: x["total_score"], reverse=True)
 
-    # 4. Assign Ranks
-    for i, res in enumerate(results, 1):
-        res["rank"] = i
+    # 4. Assign Ranks (Dense Ranking / Finite Declaration)
+    current_rank = 1
+    for i in range(len(results)):
+        # If not the first item, and score is strictly lower, increment rank
+        if i > 0 and results[i]["total_score"] < results[i-1]["total_score"]:
+            current_rank += 1
+            
+        results[i]["rank"] = current_rank
 
     return results
