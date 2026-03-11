@@ -8,11 +8,10 @@ try:
     from .scorer import score_resume
 except ImportError:
     from scorer import score_resume
-
-
 # ----------------------------------------------------
 
 def select_input_file(search_dir):
+    """Provides an interactive CLI menu to select the NLP JSON file."""
     if not os.path.exists(search_dir):
         print(f"❌ Error: Directory not found: {search_dir}")
         return None
@@ -39,8 +38,8 @@ def select_input_file(search_dir):
         except ValueError:
             pass
 
-
 def process_ranking():
+    """Main execution function for local testing."""
     # Define path to Nlp_Engine/output
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
@@ -75,11 +74,18 @@ def process_ranking():
                 "total_score": score
             })
 
-    # Sort
+    # Sort High to Low
     scored_results.sort(key=lambda x: x["total_score"], reverse=True)
 
-    for idx, item in enumerate(scored_results, 1):
-        item["rank"] = idx
+    # --- TIE-BREAKER FIX (Dense Ranking / Finite Declaration) ---
+    current_rank = 1
+    for i in range(len(scored_results)):
+        # If not the first item, and score is strictly lower, increment rank
+        if i > 0 and scored_results[i]["total_score"] < scored_results[i-1]["total_score"]:
+            current_rank += 1
+            
+        scored_results[i]["rank"] = current_rank
+    # ------------------------------------------------------------
 
     # Save
     output_path = os.path.join(current_dir, "ranked_candidates.json")
@@ -89,9 +95,8 @@ def process_ranking():
     print(f"🎉 Success! Ranked list saved to: {output_path}")
 
     print("\n🏆 --- TOP CANDIDATES ---")
-    for cand in scored_results[:]:
+    for cand in scored_results[:3]:
         print(f"#{cand['rank']} | Score: {cand['total_score']} | File: {cand['filename']}")
-
 
 if __name__ == "__main__":
     process_ranking()
