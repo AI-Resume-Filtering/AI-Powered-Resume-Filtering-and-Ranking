@@ -27,7 +27,8 @@ def get_adaptive_weights(job_reqs: dict) -> dict:
 
 def score_resume(resume_raw: dict, metadata: dict) -> float:
     """
-    Calculate the total Weighted Score for a single resume.
+    Calculate the total Weighted Score for a single resume, 
+    including micro-bonuses to prevent ties.
     """
     # 1. Standardize and extract data
     resume = standardize_resume_data(resume_raw)
@@ -43,10 +44,8 @@ def score_resume(resume_raw: dict, metadata: dict) -> float:
     req_exp = job_reqs.get("minimum_experience", 0)
 
     if req_exp == 0:
-        # If no experience needed, everyone gets full points relative to the weight
         exp_ratio = 1.0
     else:
-        # Cap the multiplier at 1.5x to prevent skewing
         exp_ratio = min(years / req_exp, 1.5)
 
     exp_score = min(exp_ratio * weights["experience"], weights["experience"])
@@ -58,7 +57,6 @@ def score_resume(resume_raw: dict, metadata: dict) -> float:
     req_rank = EDUCATION_RANKING.get(parse_education_level(req_edu), 3)
     cand_rank = EDUCATION_RANKING.get(parse_education_level(cand_edu), 0)
 
-    # Full points if degree is equal or higher
     if cand_rank >= req_rank:
         edu_score = weights["education"]
     else:
@@ -68,15 +66,20 @@ def score_resume(resume_raw: dict, metadata: dict) -> float:
     pref_list = job_reqs.get("preferred_skills", [])
     cand_skills = resume.get("skills", [])
 
-    # Find common skills via Set Intersection
     matched_pref = set(pref_list) & set(cand_skills)
-
-    # 2 points per preferred skill, capped at the max weight
     pref_score = min(len(matched_pref) * 2, weights["preferred_skills"])
 
-    # --- FINAL CALCULATION ---
-    final_score = skill_score + exp_score + edu_score + pref_score
-    return round(final_score, 2)
+    # --- 🔥 METRIC 5: TIE-BREAKER MICRO-SCORING ---
+    # Adds tiny fractions of a point to ensure unique scores based on profile richness
+    skill_count_bonus = len(cand_skills) * 0.001
+    project_bonus = resume.get("projects_count", 0) * 0.005
+    exp_micro_bonus = years * 0.0001 
+
+    micro_bonus = skill_count_bonus + project_bonus + exp_micro_bonus
+
+    # --- FINAL CALCULATION (4 Decimals to prevent ties) ---
+    final_score = skill_score + exp_score + edu_score + pref_score + micro_bonus
+    return round(final_score, 4)
 
 
 # ==========================================================
@@ -127,15 +130,11 @@ def process_resume_batch(filename: str, backend_metadata: dict) -> list:
             })
 
     # 3. Sort (High to Low)
-    results.sort(key=lambda x: x["total_score"], reverse=True)
+    # Cascading Sort: Primary is Total Score, Secondary is exact Experience Years
+    results.sort(key=lambda x: (x["total_score"], x["details"]["experience_years"]), reverse=True)
 
-    # 4. Assign Ranks (Dense Ranking / Finite Declaration)
-    current_rank = 1
-    for i in range(len(results)):
-        # If not the first item, and score is strictly lower, increment rank
-        if i > 0 and results[i]["total_score"] < results[i-1]["total_score"]:
-            current_rank += 1
-            
-        results[i]["rank"] = current_rank
+    # 4. Assign Strict Ranks (Finite declaration, no ties)
+    for i, res in enumerate(results, 1):
+        res["rank"] = i
 
     return results
