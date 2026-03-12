@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "request_id": "REQ_20260217_022210",
-    "processed_at": "2026-02-17T02:22:10.751465",
+    "request_id": "REQ_20260311_201707",
+    "processed_at": "2026-03-11T20:17:07.605236",
     "total_resumes": 1,
     "successfully_parsed": 1,
     "failed": 0
@@ -39,71 +39,85 @@
   },
   "resumes": {
     "resume_001": {
-      "resume_filename": "resume_fd1fdb4b23f5488d870645ca34db944d.txt",
+      "resume_filename": "resume_9f89001e6fe14e93a6693f4c997a2ae9.txt",
       "sequential_id": "001",
       "contact_info": {
-        "email": "ughademayur67@gmail.com",
-        "phone": "+91) 7823029229"
+        "email": "maheshnikas121@gmail.com",
+        "phone": "+91 9356736650"
       },
       "skills": [
         "python",
         "java",
         "javascript",
+        "c++",
         "c",
         "go",
         "r",
         "machine learning",
-        "deep learning",
+        "artificial intelligence",
+        "natural language processing",
+        "nlp",
+        "computer vision",
+        "tensorflow",
+        "opencv",
+        "spacy",
+        "nltk",
         "sql",
         "mysql",
         "mongodb",
         "oracle",
         "flask",
-        "spring",
         "jsp",
         "servlets",
         "jdbc",
         "html",
+        "css",
         "typescript",
         "git",
         "github",
+        "docker",
+        "power bi",
         "pandas",
         "numpy",
         "matplotlib",
-        "rest api",
-        "web3"
+        "blockchain"
       ],
       "skill_categories": {
-        "programming_language": 6,
-        "ai_ml": 5,
+        "programming_language": 7,
+        "ai_ml": 12,
         "database": 4,
-        "backend": 6,
-        "frontend": 2,
-        "tools": 3
+        "backend": 4,
+        "frontend": 3,
+        "tools": 5
       },
       "experience_years": 1,
-      "education_level": "masters",
+      "skill_experience": {},
+      "education_level": "bachelors",
       "job_match": {
         "meets_requirements": false,
         "matched_required_skills": [
           "c",
           "machine learning",
-          "python",
-          "r",
           "numpy",
-          "deep learning",
-          "sql",
-          "pandas"
+          "r",
+          "tensorflow",
+          "pandas",
+          "python",
+          "sql"
         ],
         "matched_preferred_skills": [
           "c",
-          "machine learning",
           "typescript",
+          "nlp",
+          "docker",
+          "go",
+          "computer vision",
           "r",
-          "go"
+          "natural language processing",
+          "machine learning"
         ],
         "missing_required_skills": [
-          "tensorflow",
+          "deep learning",
           "pytorch"
         ],
         "match_percentage": 80.0,

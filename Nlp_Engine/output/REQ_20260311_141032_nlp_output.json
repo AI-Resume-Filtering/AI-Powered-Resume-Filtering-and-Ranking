@@ -1,122 +1,120 @@
 {
   "metadata": {
-    "request_id": "REQ_20260217_110215",
-    "processed_at": "2026-02-17T11:02:15.810336",
+    "request_id": "REQ_20260311_141032",
+    "processed_at": "2026-03-11T14:10:34.194719",
     "total_resumes": 1,
     "successfully_parsed": 1,
     "failed": 0
   },
   "job_requirements": {
-    "job_title": "Data Scientist",
+    "job_title": "Full Stack Developer",
     "required_skills": [
       "python",
-      "c",
-      "r",
-      "machine learning",
-      "deep learning",
-      "tensorflow",
-      "pytorch",
-      "sql",
-      "pandas",
-      "numpy"
-    ],
-    "preferred_skills": [
+      "java",
       "c",
       "go",
       "r",
-      "machine learning",
-      "natural language processing",
-      "nlp",
-      "computer vision",
-      "typescript",
-      "docker",
-      "aws"
+      "sql",
+      "mysql",
+      "mongodb",
+      "spring",
+      "react",
+      "git",
+      "rest api"
     ],
-    "minimum_experience": 3,
+    "preferred_skills": [
+      "c",
+      "r",
+      "docker",
+      "kubernetes",
+      "aws",
+      "rest api",
+      "web3"
+    ],
+    "minimum_experience": 2,
     "required_education": "bachelors",
     "responsibilities": [],
-    "total_requirements": 20
+    "total_requirements": 19
   },
   "resumes": {
     "resume_001": {
-      "resume_filename": "resume_5d70f8f83a61427ab64f10dff367c7d5.txt",
+      "resume_filename": "resume_70f4645b881e4d229f954882c84c8190.txt",
       "sequential_id": "001",
       "contact_info": {
-        "email": "maheshnikas121@gmail.com",
-        "phone": "+91 9356736650"
+        "email": "ughademayur67@gmail.com",
+        "phone": "+91) 7823029229"
       },
       "skills": [
         "python",
         "java",
         "javascript",
-        "c++",
         "c",
         "go",
         "r",
+        "scala",
         "machine learning",
         "deep learning",
         "artificial intelligence",
         "natural language processing",
         "nlp",
+        "tensorflow",
         "sql",
         "mysql",
         "mongodb",
         "oracle",
         "flask",
+        "django",
+        "spring",
         "jsp",
         "servlets",
         "jdbc",
         "html",
-        "css",
-        "react",
         "typescript",
         "git",
         "github",
-        "docker",
         "pandas",
         "numpy",
         "matplotlib",
-        "blockchain",
+        "rest api",
         "web3"
       ],
       "skill_categories": {
         "programming_language": 7,
-        "ai_ml": 8,
+        "ai_ml": 9,
         "database": 4,
-        "backend": 4,
-        "frontend": 4,
-        "tools": 5
+        "backend": 7,
+        "frontend": 2,
+        "tools": 3
       },
-      "experience_years": 3,
-      "education_level": "bachelors",
+      "experience_years": 1,
+      "skill_experience": {},
+      "education_level": "masters",
       "job_match": {
         "meets_requirements": false,
         "matched_required_skills": [
-          "machine learning",
-          "python",
-          "deep learning",
-          "sql",
-          "numpy",
           "c",
-          "pandas",
-          "r"
+          "mongodb",
+          "spring",
+          "go",
+          "git",
+          "r",
+          "rest api",
+          "mysql",
+          "python",
+          "java",
+          "sql"
         ],
         "matched_preferred_skills": [
-          "machine learning",
-          "typescript",
-          "natural language processing",
-          "docker",
           "c",
-          "nlp",
-          "go",
-          "r"
+          "web3",
+          "r",
+          "rest api"
         ],
         "missing_required_skills": [
-          "pytorch",
-          "tensorflow"
+          "react"
         ],
-        "match_percentage": 80.0,
-        "experience_match": true,
+        "match_percentage": 91.67,
+        "experience_match": false,
         "education_match": true
       },
       "scoring_ready": true
