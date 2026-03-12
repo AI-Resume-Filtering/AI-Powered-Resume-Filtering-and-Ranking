@@ -46,7 +46,6 @@
       },
       "skills": [
         "python",
-        "java",
         "javascript",
         "c++",
         "c",
@@ -112,7 +111,7 @@
           "spring",
           "rest api"
         ],
-        "match_percentage": 83.33,
+        "match_percentage": 82.33,
         "experience_match": true,
         "education_match": true
       },
