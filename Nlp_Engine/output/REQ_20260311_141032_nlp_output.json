@@ -46,7 +46,6 @@
       },
       "skills": [
         "python",
-        "java",
         "javascript",
         "c",
         "go",
@@ -110,11 +109,16 @@
           "r",
           "rest api"
         ],
+<<<<<<< HEAD:Nlp_Engine/output/REQ_20260311_141032_nlp_output.json
         "missing_required_skills": [
           "react"
         ],
         "match_percentage": 91.67,
         "experience_match": false,
+=======
+        "match_percentage": 82.33,
+        "experience_match": true,
+>>>>>>> 1776b7d625c07b94209baf27627ca1783b21952f:Nlp_Engine/output/REQ_20260217_003936_nlp_output.json
         "education_match": true
       },
       "scoring_ready": true
