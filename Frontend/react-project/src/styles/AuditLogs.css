@@ -1,0 +1,325 @@
+/* ─────────────────────────────────────────────────────────────────
+   AuditLogs Dashboard Panel
+   ───────────────────────────────────────────────────────────────── */
+
+.auditlogs-container {
+  padding: 28px 32px;
+  color: #e2e8f0;
+  font-family: "Segoe UI", sans-serif;
+  min-height: 100%;
+}
+
+/* ── gate (admin-key entry) ──────────────────────────────────────── */
+.auditlogs-gate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.auditlogs-gate-card {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  padding: 40px 48px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  color: #e2e8f0;
+}
+
+.auditlogs-gate-card h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.auditlogs-gate-card p {
+  margin-bottom: 20px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.auditlogs-gate-card input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 14px;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.auditlogs-gate-card input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56,189,248,.2);
+}
+
+/* ── header ──────────────────────────────────────────────────────── */
+.auditlogs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.auditlogs-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.auditlogs-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ── metrics strip ───────────────────────────────────────────────── */
+.auditlogs-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.al-metric {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  padding: 12px 18px;
+  min-width: 110px;
+  text-align: center;
+}
+
+.al-metric span {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.al-metric label {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.al-metric.accent-green span { color: #4ade80; }
+.al-metric.accent-red   span { color: #f87171; }
+.al-metric.accent-yellow span { color: #facc15; }
+
+/* ── filters ─────────────────────────────────────────────────────── */
+.auditlogs-filters {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.al-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.al-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+  flex: 1;
+}
+
+.al-field label {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.al-field input,
+.al-field select {
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 13px;
+  outline: none;
+}
+
+.al-field input:focus,
+.al-field select:focus {
+  border-color: #38bdf8;
+}
+
+.al-filter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── buttons ─────────────────────────────────────────────────────── */
+.al-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+
+.al-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,.07);
+  border-color: #64748b;
+}
+
+.al-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.al-btn-primary {
+  background: #0b3d91;
+  border-color: #0b3d91;
+  color: #fff;
+}
+
+.al-btn-primary:hover:not(:disabled) {
+  background: #1251c8;
+  border-color: #1251c8;
+}
+
+.al-btn-danger {
+  background: transparent;
+  border-color: #dc2626;
+  color: #f87171;
+}
+
+.al-btn-danger:hover:not(:disabled) {
+  background: rgba(220,38,38,.15);
+}
+
+.al-btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* ── error ───────────────────────────────────────────────────────── */
+.auditlogs-error {
+  color: #f87171;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* ── results header ──────────────────────────────────────────────── */
+.auditlogs-results-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+/* ── table ───────────────────────────────────────────────────────── */
+.auditlogs-table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.auditlogs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.auditlogs-table th {
+  background: rgba(255,255,255,.06);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.auditlogs-table td {
+  padding: 9px 14px;
+  border-top: 1px solid rgba(255,255,255,.05);
+  vertical-align: top;
+  color: #cbd5e1;
+}
+
+.auditlogs-table tbody tr:hover {
+  background: rgba(255,255,255,.03);
+}
+
+.al-mono  { font-family: "Courier New", monospace; font-size: 12px; }
+.al-nowrap { white-space: nowrap; }
+.al-ua    { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b; font-size: 11px; }
+.al-empty { text-align: center; color: #475569; padding: 32px !important; }
+
+.al-tag {
+  background: rgba(56,189,248,.12);
+  color: #7dd3fc;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* outcome badges */
+.al-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  background: rgba(148,163,184,.12);
+  color: #94a3b8;
+}
+
+.al-badge.outcome-success { background: rgba(74,222,128,.12); color: #4ade80; }
+.al-badge.outcome-warn    { background: rgba(250,204,21,.12);  color: #fbbf24; }
+.al-badge.outcome-fail    { background: rgba(248,113,113,.12); color: #f87171; }
+
+/* metadata cell */
+.al-meta { max-width: 220px; }
+.al-meta-item {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── pagination ──────────────────────────────────────────────────── */
+.auditlogs-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* ── responsive ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .auditlogs-container { padding: 16px; }
+  .al-filter-row { flex-direction: column; }
+  .auditlogs-metrics { gap: 8px; }
+  .al-metric { min-width: 80px; padding: 10px 12px; }
+  .al-metric span { font-size: 20px; }
+}

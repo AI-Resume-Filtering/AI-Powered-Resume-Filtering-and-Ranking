@@ -1,4 +1,5 @@
 import logging
+import time
 import smtplib
 from email.message import EmailMessage
 
@@ -15,16 +16,25 @@ class EmailService:
         self.sender = sender
         self.use_tls = use_tls
 
-    def send_email(self, to_address: str, subject: str, body: str) -> None:
+    def send_email(
+        self,
+        to_address: str,
+        subject: str,
+        body: str,
+        html_body: str | None = None,
+        retries: int = 3,
+    ) -> bool:
         if not self.host or not self.sender:
             logger.warning("SMTP settings missing, skipping email")
-            return
+            return False
 
         message = EmailMessage()
         message["From"] = self.sender
         message["To"] = to_address
         message["Subject"] = subject
         message.set_content(body)
+        if html_body:
+            message.add_alternative(html_body, subtype="html")
 
         try:
             logger.info(f"Attempting to send email to {to_address} via {self.host}:{self.port}")
@@ -34,6 +44,16 @@ class EmailService:
                 if self.user and self.password:
                     server.login(self.user, self.password)
                 server.send_message(message)
-            logger.info(f"Email sent successfully to {to_address}")
-        except Exception as e:
-            logger.exception(f"Email send failed to {to_address}: {str(e)}")
+            logger.info("Email sent successfully to %s", to_address)
+            return True  # success — done
+        except Exception as exc:
+            if retries <= 1:
+                logger.exception("Email send failed to %s after all retries", to_address)
+                return False
+            wait = 2 ** (4 - retries)  # 2s, 4s, 8s
+            logger.warning(
+                "Email to %s failed (%s), retrying in %ds (%d attempts left)...",
+                to_address, exc, wait, retries - 1,
+            )
+            time.sleep(wait)
+            return self.send_email(to_address, subject, body, html_body=html_body, retries=retries - 1)

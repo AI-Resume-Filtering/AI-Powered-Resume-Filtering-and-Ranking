@@ -1,8 +1,9 @@
 import { useState } from "react";
 import API from "../../api";
-import "../../styles/postjob.css";
+import "../../styles/PostJob.css";
 
 function PostJob({ company }) {
+
   const [jobTitle, setJobTitle] = useState("");
   const [pdfFile, setPdfFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -10,6 +11,7 @@ function PostJob({ company }) {
   const [messageType, setMessageType] = useState("info");
 
   const handleSubmit = async () => {
+
     if (!jobTitle.trim()) {
       setMessageType("error");
       setMessage("Please enter job title");
@@ -31,6 +33,7 @@ function PostJob({ company }) {
     setLoading(true);
 
     try {
+
       const formData = new FormData();
       formData.append("companyId", company.companyId);
       formData.append("jobTitle", jobTitle);
@@ -43,61 +46,115 @@ function PostJob({ company }) {
         setMessage("Job posted successfully!");
         setJobTitle("");
         setPdfFile(null);
-      } else {
+      } 
+      else {
         setMessageType("error");
         setMessage(data.message || "Failed to post job");
       }
-    } catch (err) {
+
+    } 
+    catch (err) {
       console.error(err);
       setMessageType("error");
       setMessage("Error posting job. Make sure backend is running.");
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
+
   };
 
   return (
-    <div className="post-job-wrapper">
-      <div className="card">
-        <h2>Post Job</h2>
 
-      {/* Job Title */}
-      <input
-        type="text"
-        placeholder="Job Title"
-        value={jobTitle}
-        onChange={(e) => setJobTitle(e.target.value)}
-      />
+    <div className="pj-wrapper">
 
-      {/* PDF Upload */}
-      <label className="file-label">
-        Upload Job Description (PDF)
-      </label>
+      {/* POST JOB CARD */}
 
-      <input
-        type="file"
-        accept="application/pdf"
-        onChange={(e) => setPdfFile(e.target.files[0])}
-      />
+      <div className="pj-card">
 
-      {/* Show selected PDF */}
-      {pdfFile && (
-        <p className="file-name">
-          Selected File: {pdfFile.name}
-        </p>
-      )}
+        <h2 className="pj-title">Post Job</h2>
 
-        <button className="primary" onClick={handleSubmit} disabled={loading}>
+        <input
+          className="pj-input"
+          type="text"
+          placeholder="Job Title"
+          value={jobTitle}
+          onChange={(e) => setJobTitle(e.target.value)}
+        />
+
+        <label className="pj-file-label">
+          Upload Job Description (PDF)
+        </label>
+
+        <div
+          className="pj-upload-box"
+          onClick={() => document.getElementById("pjFileInput").click()}
+        >
+
+          <p className="pj-upload-text">
+            Drag & Drop PDF Here
+          </p>
+
+          <p className="pj-upload-subtext">
+            or click to upload
+          </p>
+
+          <input
+            id="pjFileInput"
+            className="pj-hidden-input"
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => setPdfFile(e.target.files[0])}
+          />
+
+        </div>
+
+        {pdfFile && (
+          <p className="pj-file-name">
+            📄 {pdfFile.name}
+          </p>
+        )}
+
+        <button
+          className="pj-btn-primary"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           {loading ? "Posting..." : "Post Job"}
         </button>
 
         {message && (
-          <div className={`status-msg ${messageType}`}>
+          <div className={`pj-status-msg pj-${messageType}`}>
             {message}
           </div>
         )}
+
       </div>
+
+
+      {/* INFO PANEL */}
+
+      <div className="pj-info-panel">
+
+        <h3 className="pj-info-title">📄 Accepted File Type</h3>
+
+        <p className="pj-info-text">
+          Only PDF files are allowed for job description upload.
+        </p>
+
+        <h3 className="pj-info-title">📌 Instructions</h3>
+
+        <ul className="pj-info-list">
+          <li>Use a clear job title</li>
+          <li>Upload detailed job description</li>
+          <li>Include required skills</li>
+          <li>Provide company information</li>
+        </ul>
+
+      </div>
+
     </div>
+
   );
 }
 

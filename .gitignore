@@ -32,7 +32,7 @@ wheels/
 *~
 
 ## Output files (keep folder structure, ignore generated files)
-#Nlp_Engine/output/*.json
+Nlp_Engine/output/*.json
 Nlp_Engine/output/*.log
 !Nlp_Engine/output/README.md
 
@@ -52,3 +52,20 @@ htmlcov/
 *.tmp
 temp/
 tmp/
+
+# Project-specific runtime data
+mongodb-data/
+mongodb-log/
+
+# Environment files
+.env
+.env.*
+
+# Backend local runtime state
+Backend/instance/
+
+# Frontend dependencies and build output
+Frontend/react-project/node_modules/
+Frontend/react-project/build/
+Frontend/react-project/dist/
+Frontend/instance/

@@ -7,6 +7,7 @@ import CompanyDashboard from "./pages/dashboard/CompanyDashboard";
 import JobList from "./pages/JobList";
 import ApplyJob from "./pages/ApplyJob";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/company-login" element={<CompanyLogin />} />
         <Route path="/company-register" element={<CompanyRegister />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route
           path="/company-dashboard"

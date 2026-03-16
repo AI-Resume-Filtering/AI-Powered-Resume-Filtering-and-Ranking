@@ -9,50 +9,48 @@ from datetime import datetime
 
 def calculate_experience_years(text: str) -> int:
     """
-    Calculate total years of experience
+    Calculate total years of work experience.
 
-    Methods:
-    1. Look for explicit mentions: "2 years of experience"
-    2. Calculate from date ranges: "2023-2025"
-    3. Count from earliest year to present
+    Methods (in priority order):
+    1. Sum explicit date ranges: "2020-2023", "Jan 2022 - Present"
+    2. Sum explicit year mentions per position: "2 years at X", "3 years at Y"  -> 5
+    3. Count recognised job-title keywords as a last-resort fallback (1 yr each)
 
-    Args:
-        text: Experience section text
-
-    Returns:
-        Total years (integer)
+    L9 fix: SUM ranges/mentions instead of taking max.
+    L10 fix: Use actual (end - start) arithmetic per range, not (now - earliest).
     """
-    # Method 1: Explicit mentions
-    year_pattern = r'(\d+)\s*(?:year|yr)s?'
-    matches = re.findall(year_pattern, text.lower())
-
-    if matches:
-        return max(map(int, matches))
-
-    # Method 2: Calculate from year ranges
     current_year = datetime.now().year
-    year_mentions = re.findall(r'\b(20\d{2})\b', text)
+    text_lower = text.lower()
 
-    if year_mentions:
-        years = [int(y) for y in year_mentions]
-        earliest = min(years)
+    # Method 1: Detect and SUM all date ranges in the experience section
+    # Handles: "2020-2023", "2020 - present", "2020–2023"
+    range_pattern = r'\b(20\d{2})\s*[-\u2013to]+\s*(20\d{2}|present|current|now)\b'
+    ranges = re.findall(range_pattern, text_lower)
+    if ranges:
+        total = 0
+        for start_str, end_str in ranges:
+            start = int(start_str)
+            end = current_year if end_str in ('present', 'current', 'now') else int(end_str)
+            duration = end - start
+            # Sanity: only count positive durations under 20 years per job
+            if 0 < duration <= 20:
+                total += duration
+        if total > 0:
+            return min(total, 40)  # hard cap at 40 years
 
-        # Sanity check: Not more than 50 years ago
-        if current_year - earliest < 50:
-            return current_year - earliest
+    # Method 2: Sum all explicit "N year(s)" mentions (likely separate positions)
+    year_pattern = r'(\d+)\s*\+?\s*(?:year|yr)s?'
+    matches = re.findall(year_pattern, text_lower)
+    if matches:
+        return min(sum(int(m) for m in matches), 40)
 
-    # Method 3: Count positions (fallback)
-    # Assume each position = 1 year
+    # Method 3: Count recognised job-title keywords as a fallback (1 year each)
     position_keywords = [
         'intern', 'developer', 'engineer', 'analyst',
-        'manager', 'consultant', 'specialist'
+        'manager', 'consultant', 'specialist',
     ]
-
-    count = 0
-    for keyword in position_keywords:
-        count += len(re.findall(keyword, text.lower()))
-
-    return min(count, 10)  # Cap at 10 years
+    count = sum(len(re.findall(kw, text_lower)) for kw in position_keywords)
+    return min(count, 10)
 
 
 def calculate_skill_experience(text: str, skills_list: list) -> dict:

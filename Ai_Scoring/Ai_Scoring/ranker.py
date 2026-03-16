@@ -8,65 +8,74 @@ except ImportError:
     from scorer import score_resume
 
 
-def process_ranking():
-    # --- EXACT PATH RESOLUTION (Handles the double folder) ---
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
-    project_root = os.path.dirname(parent_dir)
+def _resolve_candidate_name(resume_data: dict) -> str:
+    """Extract a clean display name from resume data."""
+    candidate_name = resume_data.get("contact_info", {}).get("name")
+    if candidate_name:
+        return candidate_name
 
+    raw_filename = resume_data.get("resume_filename", "Unknown")
+    email = resume_data.get("contact_info", {}).get("email", "")
+
+    if raw_filename.startswith("resume_") and len(raw_filename) > 20 and email:
+        return ''.join(c for c in email.split('@')[0] if not c.isdigit()).title()
+
+    clean = (raw_filename
+             .replace(".txt", "").replace(".pdf", "").replace(".docx", "")
+             .replace("_", " ").replace("-", " "))
+    return ''.join(c for c in clean if not c.isdigit()).strip().title() or "Unknown"
+
+
+def process_ranking():
+    # --- Path resolution (handles the double Ai_Scoring/Ai_Scoring/ folder) ---
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(current_dir))
     nlp_output_dir = os.path.join(project_root, "Nlp_Engine", "output")
-    # ---------------------------------------------------------
+    # ---------------------------------------------------------------------------
 
     if not os.path.exists(nlp_output_dir):
         print(f"❌ Error: Directory not found: {nlp_output_dir}")
         return
 
-    # Find ALL json files in the folder
     json_files = [f for f in os.listdir(nlp_output_dir) if f.endswith('.json')]
-
     if not json_files:
         print(f"⚠️  No JSON files found in {nlp_output_dir}")
         return
 
-    print(f"\n⚙️  Processing {len(json_files)} resume files from NLP Output...")
+    print(f"\n⚙️  Processing {len(json_files)} NLP output file(s)...")
 
     scored_results = []
 
-    # Loop through EVERY single file in the folder
     for filename in json_files:
         filepath = os.path.join(nlp_output_dir, filename)
-
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
-            metadata = data.get("metadata", {})
+            # ── FIX: job_requirements lives at top-level, NOT inside metadata ──
+            metadata = {"job_requirements": data.get("job_requirements", {})}
             resumes = data.get("resumes", {})
 
             for resume_id, resume_data in resumes.items():
-                if resume_data.get("scoring_ready", False):
-                    score = score_resume(resume_data, metadata)
+                if not resume_data.get("scoring_ready", False):
+                    continue
 
-                    # Extract Clean Name
-                    raw_filename = resume_data.get("resume_filename", "Unknown")
-                    email = resume_data.get("contact_info", {}).get("email", "")
-                    candidate_name = resume_data.get("contact_info", {}).get("name")
+                score = score_resume(resume_data, metadata)
+                job_match = resume_data.get("job_match", {})
 
-                    if not candidate_name:
-                        if raw_filename.startswith("resume_") and len(raw_filename) > 20 and email:
-                            candidate_name = ''.join([i for i in email.split('@')[0] if not i.isdigit()]).title()
-                        else:
-                            clean = raw_filename.replace(".txt", "").replace(".pdf", "").replace(".docx", "").replace(
-                                "_", " ").replace("-", " ")
-                            candidate_name = ''.join([i for i in clean if not i.isdigit()]).strip().title()
+                scored_results.append({
+                    "rank": 0,
+                    "resume_id": resume_id,
+                    "candidate_name": _resolve_candidate_name(resume_data),
+                    "filename": resume_data.get("resume_filename", "Unknown"),
+                    "total_score": score,
+                    # Tiebreaker fields — reflect real candidate quality differences
+                    "_matched_required": len(job_match.get("matched_required_skills", [])),
+                    "_experience_years": resume_data.get("experience_years", 0),
+                    "_matched_preferred": len(job_match.get("matched_preferred_skills", [])),
+                    "_skill_count": len(resume_data.get("skills", [])),
+                })
 
-                    scored_results.append({
-                        "rank": 0,
-                        "resume_id": resume_id,
-                        "candidate_name": candidate_name or "Unknown",
-                        "filename": raw_filename,
-                        "total_score": score
-                    })
         except Exception as e:
             print(f"⚠️ Could not process {filename}: {str(e)}")
 
@@ -74,30 +83,28 @@ def process_ranking():
         print("⚠️ No candidates were marked as 'scoring_ready: true' across all files.")
         return
 
-    # 1. Sort the massive combined list High to Low
-    scored_results.sort(
-        key=lambda x: x["total_score"],
-        reverse=True
-    )
+    # ── Multi-key sort: primary = total score, then real quality signals ────────
+    # Scores are NEVER modified — tiebreakers use actual extracted candidate data.
+    scored_results.sort(key=lambda x: (
+        -x["total_score"],
+        -x["_matched_required"],
+        -x["_experience_years"],
+        -x["_matched_preferred"],
+        -x["_skill_count"],
+    ))
+    # ────────────────────────────────────────────────────────────────────────────
 
-    # 2. --- 🔥 STRICT UNIQUE SCORE ENFORCER 🔥 ---
-    # If a score is identical to the one above it, subtract a microscopic fraction to break the tie!
-    for i in range(1, len(scored_results)):
-        if scored_results[i]["total_score"] >= scored_results[i - 1]["total_score"]:
-            scored_results[i]["total_score"] = scored_results[i - 1]["total_score"] - 0.0001
-    # ---------------------------------------------
-
-    # 3. Assign strict ranks
+    # Assign sequential ranks and strip private tiebreaker fields from output
     for idx, item in enumerate(scored_results, 1):
         item["rank"] = idx
+        for key in ["_matched_required", "_experience_years", "_matched_preferred", "_skill_count"]:
+            item.pop(key, None)
 
     output_path = os.path.join(current_dir, "ranked_candidates.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(scored_results, f, indent=4)
 
-    print(f"🎉 Success! Combined ranked list saved to: {output_path}")
-
-    # --- EXACT FORMAT REQUESTED ---
+    print(f"🎉 Success! Ranked list saved to: {output_path}")
     print("\nrank | score     | name")
     print("-" * 40)
     for cand in scored_results:

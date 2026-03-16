@@ -1,0 +1,251 @@
+/* PAGE WRAPPER */
+
+.jl-page-wrapper {
+    width: 100%;
+    min-height: 80vh;
+    padding: 30px;
+    box-sizing: border-box;
+    background-color: #0b0b1d;
+    /* dark theme background */
+    color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* HEADER */
+
+.jl-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.jl-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-right: auto;
+}
+
+.jl-back-btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 20px;
+}
+
+.jl-back-btn:hover {
+    background-color: #1d4ed8;
+}
+
+
+/* GRID OF JOB CARDS */
+
+.jl-grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+
+/* NO JOBS MESSAGE */
+
+.jl-no-jobs {
+    text-align: center;
+    font-size: 18px;
+    color: #94a3b8;
+    width: 100%;
+}
+
+
+/* JOB CARD */
+
+.jl-job-card {
+    background-color: #1e1e2f;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.25s ease;
+}
+
+.jl-job-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+
+/* JOB HEADER */
+
+.jl-job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.jl-job-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f5f5f5;
+}
+
+.jl-company-name {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+
+/* JOB DETAILS */
+
+.jl-job-details p {
+    font-size: 14px;
+    margin: 3px 0;
+    color: #d1d5db;
+}
+
+
+/* APPLY BUTTON */
+
+.jl-apply-btn {
+    margin-top: 10px;
+    padding: 12px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.jl-apply-btn:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+.jl-apply-btn:active {
+    transform: scale(0.98);
+}
+
+.jl-discovery-bar {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.jl-search-input,
+.jl-select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    background: #121a30;
+    color: #f5f5f5;
+}
+
+.jl-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.jl-latest-strip {
+    width: 100%;
+    max-width: 1200px;
+    padding: 18px;
+    border: 1px solid #1f2a44;
+    border-radius: 14px;
+    background: #0f1530;
+    margin-bottom: 24px;
+}
+
+.jl-latest-strip h3 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.jl-latest-strip p {
+    margin: 6px 0 12px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.jl-latest-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.jl-latest-pill {
+    border: 1px solid #334155;
+    background: #17203a;
+    color: #e2e8f0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    min-width: 180px;
+}
+
+.jl-latest-pill small {
+    display: block;
+    color: #93c5fd;
+    margin-top: 2px;
+}
+
+.jl-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.jl-new-badge {
+    font-size: 11px;
+    background: #22c55e;
+    color: #052e16;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-weight: 700;
+}
+
+.jl-posted-text {
+    font-size: 12px;
+    color: #93c5fd;
+}
+
+.jl-load-more-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border-radius: 9px;
+    border: 1px solid #334155;
+    background: #17203a;
+    color: #f8fafc;
+    cursor: pointer;
+}
+
+.jl-load-more-btn:hover {
+    background: #1e2a4c;
+}
+
+@media (max-width: 900px) {
+    .jl-discovery-bar {
+        grid-template-columns: 1fr;
+    }
+}
