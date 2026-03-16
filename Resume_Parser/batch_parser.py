@@ -1,10 +1,4 @@
-"""
-Batch Parser
-Processes multiple resumes and JDs from Samples folder
-"""
-
 import os
-from pathlib import Path
 from .resume_parser import ResumeParser
 
 
@@ -13,34 +7,52 @@ class BatchParser:
     def __init__(self, samples_folder: str = None):
 
         self.parser = ResumeParser()
-        
-        # Auto-detect Samples folder if not provided
-        if samples_folder:
-            self.samples_folder = samples_folder
-        else:
-            # Assume Samples is in project root
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            project_root = os.path.dirname(current_dir)
-            self.samples_folder = os.path.join(project_root, "Samples")
-        
-        # Input folders
-        self.resumes_folder = os.path.join(self.samples_folder, "Resumes")
-        self.jd_folder = os.path.join(self.samples_folder, "Job_Descriptions")
-        
-        # Output folders (inside Resume_Parser package)
+
         self.package_dir = os.path.dirname(os.path.abspath(__file__))
+        self.project_root = os.path.dirname(self.package_dir)
+        self.input_root, self.resumes_folder, self.jd_folder = self._resolve_input_folders(
+            samples_folder
+        )
+
         self.output_resumes = os.path.join(self.package_dir, "parsed_resumes")
         self.output_jd = os.path.join(self.package_dir, "Parsed_JD")
-        
-        # Create output folders
+
         os.makedirs(self.output_resumes, exist_ok=True)
         os.makedirs(self.output_jd, exist_ok=True)
-        
+
         print(f"✓ Batch Parser Initialized")
+        print(f"  Input root: {self.input_root}")
         print(f"  Input - Resumes: {self.resumes_folder}")
         print(f"  Input - JDs: {self.jd_folder}")
         print(f"  Output - Resumes: {self.output_resumes}")
         print(f"  Output - JDs: {self.output_jd}")
+
+    def _resolve_input_folders(self, input_root: str = None) -> tuple[str, str, str]:
+        roots = [input_root] if input_root else [
+            os.path.join(self.project_root, "Samples"),
+            os.path.join(self.project_root, "data"),
+        ]
+
+        candidate_pairs = [
+            ("Resumes", "Job_Descriptions"),
+            ("resumes", "job_descriptions"),
+        ]
+
+        for root in roots:
+            if not root:
+                continue
+            for resumes_name, jd_name in candidate_pairs:
+                resumes_folder = os.path.join(root, resumes_name)
+                jd_folder = os.path.join(root, jd_name)
+                if os.path.isdir(resumes_folder) or os.path.isdir(jd_folder):
+                    return root, resumes_folder, jd_folder
+
+        default_root = roots[0]
+        return (
+            default_root,
+            os.path.join(default_root, "Resumes"),
+            os.path.join(default_root, "Job_Descriptions"),
+        )
     
     
     def parse_all_resumes(self) -> dict:

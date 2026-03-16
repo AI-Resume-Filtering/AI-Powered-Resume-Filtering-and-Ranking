@@ -1,118 +1,179 @@
-/**
- * API Configuration and Helper Functions
- * Centralized API calls for the React frontend
- */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-
-/**
- * API Helper Class
- */
 class API {
-  /**
-   * Company Registration
-   */
+  static async _requestJson(path, options = {}) {
+    try {
+      const response = await fetch(`${API_BASE_URL}${path}`, options);
+      let payload = {};
+
+      try {
+        payload = await response.json();
+      } catch {
+        payload = {};
+      }
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          message: payload.message || `Request failed (${response.status})`,
+          ...payload,
+        };
+      }
+
+      return { status: response.status, ...payload };
+    } catch {
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
+  }
+
+  /** S4/A1: Return the stored JWT token. */
+  static getToken() {
+    return localStorage.getItem('authToken');
+  }
+
+  /** Build Authorization header for protected company endpoints. */
+  static _authHeader() {
+    const token = API.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
   static async registerCompany(data) {
-    const response = await fetch(`${API_BASE_URL}/company/register`, {
+    return API._requestJson('/company/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
-    return response.json();
   }
 
-  /**
-   * Company Login
-   */
   static async loginCompany(email, password) {
-    const response = await fetch(`${API_BASE_URL}/company/login`, {
+    return API._requestJson('/company/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
+  }
+
+  static async requestPasswordReset(email, frontendBaseUrl = '') {
+    return API._requestJson('/company/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, frontendBaseUrl }),
+    });
+  }
+
+  static async resetPassword(token, password, confirmPassword) {
+    return API._requestJson('/company/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, password, confirmPassword }),
+    });
+  }
+
+  static async validateResetToken(token) {
+    return API._requestJson('/company/reset-password/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+  }
+
+  static async getAllJobs(params = {}) {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        query.set(key, String(value));
+      }
+    });
+
+    const suffix = query.toString() ? `?${query.toString()}` : "";
+    const response = await fetch(`${API_BASE_URL}/jobs${suffix}`);
     return response.json();
   }
 
-  /**
-   * Get all jobs (for candidates)
-   */
-  static async getAllJobs() {
-    const response = await fetch(`${API_BASE_URL}/jobs`);
-    return response.json();
-  }
-
-  /**
-   * Get specific job details
-   */
   static async getJobDetails(jobId) {
     const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
     return response.json();
   }
 
-  /**
-   * Get company's posted jobs
-   */
+  /** S4: Sends auth token so backend can verify ownership. */
   static async getCompanyJobs(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/jobs`);
+    const response = await fetch(`${API_BASE_URL}/company/${companyId}/jobs`, {
+      headers: { ...API._authHeader() },
+    });
     return response.json();
   }
 
-  /**
-   * Post a new job
-   */
   static async postJob(formData) {
     const response = await fetch(`${API_BASE_URL}/company/post-job`, {
       method: 'POST',
-      body: formData  // FormData object with file
+      headers: { ...API._authHeader() },
+      body: formData,
     });
     return response.json();
   }
 
-  /**
-   * Delete a job
-   */
   static async deleteJob(jobId) {
     const response = await fetch(`${API_BASE_URL}/company/delete-job`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jobId })
+      headers: { 'Content-Type': 'application/json', ...API._authHeader() },
+      body: JSON.stringify({ jobId }),
     });
     return response.json();
   }
 
-  /**
-   * Apply for a job (submit resume)
-   */
   static async applyForJob(formData) {
     const response = await fetch(`${API_BASE_URL}/apply`, {
       method: 'POST',
-      body: formData  // FormData object with resume file
+      body: formData,
     });
     return response.json();
   }
 
-  /**
-   * Get company's received resumes
-   */
+  /** A3: Poll the async pipeline status for a submitted application. */
+  static async getApplicationStatus(applicationId) {
+    const response = await fetch(`${API_BASE_URL}/apply/status/${applicationId}`);
+    return response.json();
+  }
+
   static async getCompanyResumes(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/resumes`);
+    const response = await fetch(`${API_BASE_URL}/company/${companyId}/resumes`, {
+      headers: { ...API._authHeader() },
+    });
     return response.json();
   }
 
-  /**
-   * Get company's application history
-   */
   static async getCompanyHistory(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/history`);
+    const response = await fetch(`${API_BASE_URL}/company/${companyId}/history`, {
+      headers: { ...API._authHeader() },
+    });
     return response.json();
   }
 
-  /**
-   * Health check
-   */
-  static async healthCheck() {
-    const response = await fetch(`${API_BASE_URL}/health`);
+  /** Email template: load the company's saved selection notification template. */
+  static async getEmailTemplate(companyId) {
+    const response = await fetch(`${API_BASE_URL}/company/${companyId}/email-template`, {
+      headers: { ...API._authHeader() },
+    });
     return response.json();
+  }
+
+  /** Email template: save/update the company's selection notification template. */
+  static async saveEmailTemplate(companyId, subject, body) {
+    const response = await fetch(`${API_BASE_URL}/company/${companyId}/email-template`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...API._authHeader() },
+      body: JSON.stringify({ subject, body }),
+    });
+    return response.json();
+  }
+
+  static async healthCheck() {
+    return API._requestJson('/health');
   }
 }
 

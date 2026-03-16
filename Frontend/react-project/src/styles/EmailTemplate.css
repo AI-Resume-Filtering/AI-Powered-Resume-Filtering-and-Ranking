@@ -1,0 +1,244 @@
+/* ===== Email Template Page ===== */
+
+.et-wrapper {
+    padding: 30px;
+    color: #ffffff;
+    max-width: 860px;
+}
+
+.et-loading {
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+.et-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+    padding: 36px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.et-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-bottom: 8px;
+}
+
+.et-subtitle {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+}
+
+.et-subtitle strong {
+    color: #38bdf8;
+}
+
+/* Placeholder chips */
+.et-placeholders {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: #1e293b;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.et-ph-label {
+    font-size: 12px;
+    color: #64748b;
+    margin-right: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.et-chip {
+    background: #0f172a;
+    border: 1px solid #38bdf8;
+    color: #38bdf8;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: monospace;
+}
+
+.et-chip:hover {
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Labels */
+.et-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Subject input */
+.et-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #f1f5f9;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    margin-bottom: 4px;
+}
+
+.et-input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+/* Body textarea */
+.et-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #f1f5f9;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    line-height: 1.6;
+    margin-bottom: 4px;
+}
+
+.et-textarea:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+/* Char counter */
+.et-charcount {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    color: #475569;
+    margin-bottom: 20px;
+}
+
+/* Action row */
+.et-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+.et-btn-save {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    border: none;
+    border-radius: 8px;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.et-btn-save:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7dd3fc, #38bdf8);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+
+.et-btn-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.et-btn-preview {
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.et-btn-preview:hover {
+    border-color: #38bdf8;
+    color: #38bdf8;
+}
+
+/* Status message */
+.et-message {
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.et-message--success {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+.et-message--error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+/* Preview panel */
+.et-preview-box {
+    margin-top: 28px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.et-preview-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-bottom: 16px;
+}
+
+.et-preview-subject {
+    font-size: 14px;
+    color: #cbd5e1;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: #0f172a;
+    border-radius: 6px;
+}
+
+.et-preview-body {
+    font-size: 13px;
+    color: #94a3b8;
+    white-space: pre-wrap;
+    line-height: 1.7;
+    font-family: inherit;
+    background: #0f172a;
+    padding: 16px;
+    border-radius: 6px;
+    margin: 0;
+}

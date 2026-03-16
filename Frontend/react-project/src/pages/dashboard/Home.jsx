@@ -1,78 +1,85 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../../api";
-import "../../styles/home.css";
+import "../../styles/dashboard.css";
 
 function Home({ company }) {
-  const [jobStats, setJobStats] = useState([]);
-  const [totalJobs, setTotalJobs] = useState(true);
 
-  const formatDate = (value) => {
-    if (!value) return "-";
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? "-" : parsed.toLocaleDateString();
-  };
+  const [jobs, setJobs] = useState([]);
+  const totalApplications = jobs.reduce((sum, j) => sum + (j.totalApplications || 0), 0);
 
   useEffect(() => {
     if (!company) return;
 
     API.getCompanyJobs(company.companyId)
-      .then(data => {
-        setJobStats(data || []);
-        setTotalJobs(data.length);
-      })
+      .then(data => setJobs(data || []))
       .catch(err => console.error(err));
+
   }, [company]);
 
   return (
-    <div className="home-page">
-      <div className="home-inner">
+    <div className="home-container">
 
-        <h2>Welcome, {company?.name || "Company"}</h2>
+      <h2>Welcome {company?.name}</h2>
 
-        {/* Total Jobs Card */}
-        <div className="home-cards">
-          <div className="home-card">
-            <h3>Total Jobs Posted</h3>
-            <p>{totalJobs}</p>
-          </div>
+      {/* Dashboard Cards */}
+      <div className="dashboard-cards">
+
+        <div className="card">
+          <h3>Total Jobs</h3>
+          <p>{jobs.length}</p>
         </div>
 
-        {/* Jobs Table */}
-        <div className="table-wrapper">
-          <h3>Job Posted List</h3>
+        <div className="card">
+          <h3>Total Applications</h3>
+            <p>{totalApplications}</p>
+        </div>
 
-          <table className="history-table">
-            <thead>
-              <tr>
-                <th>Sr. No</th>
-                <th>Job Position</th>
-                <th>Description</th>
-                <th>Post Date</th>
-                <th>Total Resumes</th>
-              </tr>
-            </thead>
+        <div className="card">
+          <h3>Active Jobs</h3>
+          <p>{jobs.length}</p>
+        </div>
 
-            <tbody>
-              {jobStats.length === 0 && (
-                <tr>
-                  <td colSpan="5">No jobs posted yet</td>
-                </tr>
-              )}
-
-              {jobStats.map((job, idx) => (
-                <tr key={job.jobId}>
-                  <td>{idx + 1}</td>
-                  <td>{job.title}</td>
-                  <td>{job.description || "-"}</td>
-                  <td>{formatDate(job.postDate || job.createdAt)}</td>
-                  <td>{job.totalApplications ?? 0}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="card">
+          <h3>Closed Jobs</h3>
+          <p>0</p>
         </div>
 
       </div>
+
+      {/* Job Table */}
+
+      <div className="table-box">
+
+        <h3>Recent Job Posts</h3>
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Position</th>
+              <th>Description</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {jobs.map((job,index)=>(
+              <tr key={job.jobId}>
+                <td>{index+1}</td>
+                <td>{job.title}</td>
+                <td>{job.description}</td>
+                <td>{job.postDate}</td>
+              </tr>
+            ))}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
   );
 }

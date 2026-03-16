@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import API from "../../api";
-import "../../styles/delete.css";
+import "../../styles/DeleteJob.css";
 
 function DeleteJob({ company }) {
   const [jobs, setJobs] = useState([]);
@@ -33,7 +33,9 @@ function DeleteJob({ company }) {
       return;
     }
 
-    const confirmDelete = window.confirm("Are you sure you want to delete this job?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this job?"
+    );
     if (!confirmDelete) return;
 
     setLoading(true);
@@ -45,8 +47,7 @@ function DeleteJob({ company }) {
 
       if (data.success) {
         setMessage("Job deleted successfully!");
-        // Remove from list
-        setJobs(jobs.filter(job => job.jobId !== selectedJobId));
+        setJobs(jobs.filter((job) => job.jobId !== selectedJobId));
         setSelectedJobId("");
       } else {
         setError(data.message || "Failed to delete job");
@@ -60,49 +61,70 @@ function DeleteJob({ company }) {
   };
 
   return (
-    <div className="delete-card">
-      <h2>Delete Job Post</h2>
+    <div className="dj-wrapper">
 
-      {error && <div className="error-msg">{error}</div>}
-      {message && <div className="success-msg">{message}</div>}
+      {/* Delete Card */}
+      <div className="dj-card">
+        <h2 className="dj-title">Delete Job Post</h2>
 
-      {jobs.length === 0 ? (
-        <p>No jobs posted yet</p>
-      ) : (
-        <>
-          <label>Select Job to Delete:</label>
-          <select
-            value={selectedJobId}
-            onChange={(e) => setSelectedJobId(e.target.value)}
-          >
-            <option value="">-- Choose a job --</option>
-            {jobs.map(job => (
-              <option key={job.jobId} value={job.jobId}>
-                {job.title}
-              </option>
-            ))}
-          </select>
+        {error && <div className="dj-error-msg">{error}</div>}
+        {message && <div className="dj-success-msg">{message}</div>}
 
-          {selectedJobId && (
-            <div className="job-details">
-              <p>
-                <strong>Selected:</strong> {jobs.find(j => j.jobId === selectedJobId)?.title}
-              </p>
-              <p>
-                <strong>Applications:</strong> {jobs.find(j => j.jobId === selectedJobId)?.totalApplications || 0}
-              </p>
-            </div>
-          )}
+        {jobs.length === 0 ? (
+          <p className="dj-no-job">No jobs posted yet</p>
+        ) : (
+          <>
+            <label className="dj-label">Select Job to Delete:</label>
+            <select
+              className="dj-select"
+              value={selectedJobId}
+              onChange={(e) => setSelectedJobId(e.target.value)}
+            >
+              <option value="">-- Choose a job --</option>
+              {jobs.map((job) => (
+                <option key={job.jobId} value={job.jobId}>
+                  {job.title}
+                </option>
+              ))}
+            </select>
 
-          <button
-            className="primary delete-btn"
-            onClick={handleDelete}
-            disabled={loading || !selectedJobId}
-          >
-            {loading ? "Deleting..." : "Delete Job Post"}
-          </button>
-        </>
-      )}
+            {selectedJobId && (
+              <div className="dj-job-details">
+                <p>
+                  <strong>Selected:</strong>{" "}
+                  {jobs.find((j) => j.jobId === selectedJobId)?.title}
+                </p>
+                <p>
+                  <strong>Applications:</strong>{" "}
+                  {jobs.find((j) => j.jobId === selectedJobId)?.totalApplications || 0}
+                </p>
+              </div>
+            )}
+
+            <button
+              className="dj-btn-primary"
+              onClick={handleDelete}
+              disabled={loading || !selectedJobId}
+            >
+              {loading ? "Deleting..." : "Delete Job Post"}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Instructions / Accepted File Type */}
+      <div className="dj-info-panel">
+        <h3 className="dj-info-title">📄 Accepted File Type</h3>
+        <p className="dj-info-text">Only PDF files are accepted for job description uploads.</p>
+
+        <h3 className="dj-info-title">📌 Instructions</h3>
+        <p className="dj-info-text">
+          1. Select the job you want to delete from the dropdown.<br/>
+          2. Ensure you have no ongoing applications before deleting.<br/>
+          3. Click the "Delete Job Post" button to remove the job permanently.
+        </p>
+      </div>
+
     </div>
   );
 }

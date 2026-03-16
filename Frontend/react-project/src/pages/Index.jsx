@@ -4,13 +4,6 @@ import { useNavigate } from "react-router-dom";
 function Index() {
   const navigate = useNavigate();
 
-  // Temporary test login for development
-  const handleTestLogin = () => {
-    // Store dummy company in localStorage
-    localStorage.setItem("company", JSON.stringify({ name: "Test Company" }));
-    navigate("/company-dashboard");
-  };
-
   return (
     <div className="container">
       <h2>Welcome to Resume Parsing</h2>

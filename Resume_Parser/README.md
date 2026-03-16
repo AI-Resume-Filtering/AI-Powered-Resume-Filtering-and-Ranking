@@ -1,21 +1,20 @@
 # Resume Parser Package
 
-Parse PDF resumes and job descriptions from Samples folder.
+Parse PDF resumes and job descriptions from either the existing Samples folder layout or the updated data folder layout.
 
 ---
 
-## 📁 Required Folder Structure
+## 📁 Supported Folder Structures
 
 ```
 Project/
-├── Samples/                       ← Create this folder
-│   ├── Resumes/                  ← Put resume PDFs here
-│   │   ├── resume1.pdf
-│   │   ├── resume2.pdf
-│   │   └── resume3.pdf
-│   └── Job_Descriptions/         ← Put JD PDFs here
-│       ├── jd1.pdf
-│       └── jd2.pdf
+├── Samples/                      ← Existing layout
+│   ├── Resumes/
+│   └── Job_Descriptions/
+│
+├── data/                         ← Updated layout also supported
+│   ├── resumes/
+│   └── job_descriptions/
 │
 ├── Resume_Parser/                 ← This package
 │   ├── __init__.py
@@ -76,10 +75,11 @@ This will:
 
 ## ⚙️ How It Works
 
-1. **Reads PDFs** from `Samples/Resumes` and `Samples/Job_Descriptions`
-2. **Extracts text** using pdfplumber
-3. **Cleans text** (removes artifacts, normalizes)
-4. **Saves as .txt** in `Resume_Parser/parsed_resumes/` and `Resume_Parser/Parsed_JD/`
+1. **Reads PDFs** from `Samples/Resumes` + `Samples/Job_Descriptions` or `data/resumes` + `data/job_descriptions`
+2. **Extracts text** using pdfplumber for text PDFs and tables
+3. **Falls back to OCR** using PyMuPDF + OpenCV + Tesseract for scanned pages and embedded images
+4. **Cleans text** (removes artifacts, normalizes)
+5. **Saves as .txt** in `Resume_Parser/parsed_resumes/` and `Resume_Parser/Parsed_JD/`
 
 ---
 
@@ -87,18 +87,25 @@ This will:
 
 1. **Install dependencies:**
    ```bash
-   pip install pdfplumber
+   pip install -r requirements.txt
    ```
 
-2. **Create Samples folder:**
+2. **Create one of the supported input layouts:**
    ```bash
    mkdir -p Samples/Resumes
    mkdir -p Samples/Job_Descriptions
    ```
 
+   Or:
+
+   ```bash
+   mkdir -p data/resumes
+   mkdir -p data/job_descriptions
+   ```
+
 3. **Add PDF files:**
-   - Put resume PDFs in `Samples/Resumes/`
-   - Put JD PDFs in `Samples/Job_Descriptions/`
+   - Put resume PDFs in `Samples/Resumes/` or `data/resumes/`
+   - Put JD PDFs in `Samples/Job_Descriptions/` or `data/job_descriptions/`
 
 4. **Run:**
    ```bash
@@ -180,20 +187,23 @@ nlp_result = process_resumes(jd_path, resume_paths)
 
 ## 🐛 Troubleshooting
 
-**Error: Samples folder not found**
+**Error: input folder not found**
 ```bash
-# Create it
+# Create one supported layout
 mkdir -p Samples/Resumes
 mkdir -p Samples/Job_Descriptions
 ```
 
 **Error: No PDF files found**
-- Add PDF files to `Samples/Resumes/` and `Samples/Job_Descriptions/`
+- Add PDF files to the detected input folders shown by `BatchParser`
 
-**Error: pdfplumber not installed**
+**Error: OCR dependencies missing**
 ```bash
-pip install pdfplumber
+pip install -r requirements.txt
 ```
+
+**Error: Tesseract not found**
+- Install Tesseract OCR and ensure `tesseract.exe` is on PATH, or set `pytesseract.pytesseract.tesseract_cmd`
 
 ---
 
@@ -202,4 +212,5 @@ pip install pdfplumber
 - Only PDF files are supported currently
 - Output text files are UTF-8 encoded
 - Cleaned text removes artifacts and normalizes formatting
+- Scanned PDFs no longer require Poppler because OCR uses PyMuPDF rendering
 - Output folders are auto-created inside Resume_Parser package
