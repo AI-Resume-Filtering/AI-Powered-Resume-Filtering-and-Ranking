@@ -117,7 +117,6 @@ def calculate_skill_experience(text: str, skills_list: list) -> dict:
 
     return skill_experience
 
-
 # Quick test
 if __name__ == "__main__":
     test_text = """

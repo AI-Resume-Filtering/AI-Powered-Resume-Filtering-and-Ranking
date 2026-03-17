@@ -249,6 +249,29 @@ class NLPMicroservice:
 # ============================================
 
 def process_resumes(jd_path: str, resume_paths: List[str]) -> Dict:
+    """
+    Extract data from resumes (NO RANKING)
 
+    Args:
+        jd_path: Path to job description file
+        resume_paths: List of resume file paths
+
+    Returns:
+        {
+            "success": True,
+            "request_id": "REQ_xxx",
+            "total_resumes": 5,
+            "successfully_parsed": 5,
+            "output_path": "Nlp_Engine/output/xxx.json",
+            "message": "Data extracted. Ready for AI Scoring."
+        }
+
+    Usage:
+        result = process_resumes(jd_path, resume_paths)
+
+        if result["success"]:
+            # Pass to AI Scoring Module
+            ai_module.score_and_rank(result["output_path"])
+    """
     service = NLPMicroservice()
     return service.process_request(jd_path, resume_paths)

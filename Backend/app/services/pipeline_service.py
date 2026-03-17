@@ -9,7 +9,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from Ai_Scoring.Ai_Scoring.scorer import process_resume_batch
+from Ai_Scoring.Ai_Scoring.scorer import process_resume_batchcd
 from Nlp_Engine.Nlp_service import process_resumes
 from Resume_Parser.resume_parser import ResumeParser
 
