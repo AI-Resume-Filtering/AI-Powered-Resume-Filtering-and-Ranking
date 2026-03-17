@@ -58,8 +58,7 @@ mongodb-data/
 mongodb-log/
 
 # Environment files
-.env
-.env.*
+.env.
 
 # Backend local runtime state
 Backend/instance/
