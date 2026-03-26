@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Index from "./pages/Index";
+import AboutProject from "./pages/AboutProject";
 import CompanyLogin from "./pages/CompanyLogin";
 import CompanyRegister from "./pages/CompanyRegister";
 import CompanyDashboard from "./pages/dashboard/CompanyDashboard";
@@ -14,6 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/about-project" element={<AboutProject />} />
         <Route path="/company-login" element={<CompanyLogin />} />
         <Route path="/company-register" element={<CompanyRegister />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

@@ -100,6 +100,41 @@ def ensure_indexes(db, *, audit_ttl_days: int = 90, rate_limit_ttl_days: int = 7
         background=True,
     )
 
+    # ── feedback (self-learning system) ───────────────────────────────────────
+    # Core query indexes for fast feedback retrieval
+    _safe_create(
+        db["feedback"],
+        [("resume_id", 1), ("job_id", 1)],
+        name="resume_job_composite",
+        background=True,
+    )
+    _safe_create(
+        db["feedback"],
+        [("job_id", 1), ("timestamp", -1)],
+        name="job_timestamp",
+        background=True,
+    )
+    _safe_create(
+        db["feedback"],
+        [("resume_id", 1), ("timestamp", -1)],
+        name="resume_timestamp",
+        background=True,
+    )
+    _safe_create(
+        db["feedback"],
+        [("selected", 1), ("timestamp", -1)],
+        name="selected_timestamp",
+        background=True,
+    )
+    # TTL index: auto-delete feedback older than 1 year for GDPR compliance
+    _safe_create(
+        db["feedback"],
+        [("timestamp", 1)],
+        name="ttl_timestamp",
+        expireAfterSeconds=31536000,  # 365 days in seconds
+        background=True,
+    )
+
     logger.info(
         "Database indexes ensured (audit TTL=%dd, rate-limit TTL=%dd)",
         audit_ttl_days,

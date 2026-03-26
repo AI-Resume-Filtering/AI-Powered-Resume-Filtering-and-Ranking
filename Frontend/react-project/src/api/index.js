@@ -172,6 +172,22 @@ class API {
     return response.json();
   }
 
+  static async getCompanyScoreThreshold(companyId) {
+    const response = await fetch(`${API_BASE_URL}/company/${companyId}/score-threshold`, {
+      headers: { ...API._authHeader() },
+    });
+    return response.json();
+  }
+
+  static async saveCompanyScoreThreshold(companyId, scoreThreshold) {
+    const response = await fetch(`${API_BASE_URL}/company/${companyId}/score-threshold`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...API._authHeader() },
+      body: JSON.stringify({ scoreThreshold }),
+    });
+    return response.json();
+  }
+
   static async healthCheck() {
     return API._requestJson('/health');
   }

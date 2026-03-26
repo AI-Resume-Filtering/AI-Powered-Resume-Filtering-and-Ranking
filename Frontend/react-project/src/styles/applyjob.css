@@ -131,6 +131,17 @@
     border-color: #2563eb;
 }
 
+.aj-file-input-error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+.aj-file-input-error:hover,
+.aj-file-input-error:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.24);
+}
+
 
 /* ============================= */
 

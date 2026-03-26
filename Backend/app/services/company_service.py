@@ -10,6 +10,7 @@ from .auth_service import hash_password, verify_password, generate_token
 
 
 logger = logging.getLogger(__name__)
+DEFAULT_COMPANY_SCORE_THRESHOLD = 70.0
 
 
 class CompanyService:
@@ -179,7 +180,14 @@ class CompanyService:
 </html>
 """.strip()
 
-    def register_company(self, company_name: str, registration_no: str, email: str, password: str) -> dict:
+    def register_company(
+        self,
+        company_name: str,
+        registration_no: str,
+        email: str,
+        password: str,
+        score_threshold: float = DEFAULT_COMPANY_SCORE_THRESHOLD,
+    ) -> dict:
         email = (email or "").strip().lower()
         existing = self.collection.find_one({"email": email})
         if existing:
@@ -192,11 +200,37 @@ class CompanyService:
             "registrationNo": registration_no,
             "email": email,
             "passwordHash": hash_password(password),
+            "scoreThreshold": float(score_threshold),
             "createdAt": datetime.utcnow().isoformat(),
         }
 
         self.collection.insert_one(company)
         return {"success": True, "company": self._public_company(company)}
+
+    def get_score_threshold(self, company_id: str) -> float | None:
+        company = self.collection.find_one(
+            {"companyId": company_id}, {"scoreThreshold": 1, "_id": 0}
+        )
+        if not company:
+            return None
+        try:
+            raw = company.get("scoreThreshold", None)
+            if raw is None:
+                return None
+            value = float(raw)
+            return max(0.0, min(100.0, value))
+        except (TypeError, ValueError):
+            return None
+
+    def save_score_threshold(self, company_id: str, threshold: float) -> dict:
+        value = max(0.0, min(100.0, float(threshold)))
+        result = self.collection.update_one(
+            {"companyId": company_id},
+            {"$set": {"scoreThreshold": value}},
+        )
+        if result.matched_count == 0:
+            return {"success": False, "message": "Company not found"}
+        return {"success": True, "message": "Score threshold saved", "scoreThreshold": value}
 
     def login_company(self, email: str, password: str) -> dict:
         email = (email or "").strip().lower()
@@ -696,9 +730,16 @@ class CompanyService:
 
     @staticmethod
     def _public_company(company: dict) -> dict:
+        raw_threshold = company.get("scoreThreshold")
+        try:
+            threshold = float(raw_threshold) if raw_threshold is not None else DEFAULT_COMPANY_SCORE_THRESHOLD
+        except (TypeError, ValueError):
+            threshold = DEFAULT_COMPANY_SCORE_THRESHOLD
+        threshold = max(0.0, min(100.0, threshold))
         return {
             "companyId": company.get("companyId"),
             "name": company.get("name"),
             "registrationNo": company.get("registrationNo"),
             "email": company.get("email"),
+            "scoreThreshold": threshold,
         }

@@ -5,6 +5,8 @@ from werkzeug.utils import secure_filename
 
 
 class StorageService:
+    """Persist uploaded files and temporary text artifacts used by the pipeline."""
+
     def __init__(self, uploads_dir: str, tmp_dir: str):
         self.uploads_dir = uploads_dir
         self.tmp_dir = tmp_dir
@@ -12,6 +14,7 @@ class StorageService:
         Path(self.tmp_dir).mkdir(parents=True, exist_ok=True)
 
     def save_upload(self, file_storage, subdir: str) -> str:
+        """Save user upload with a UUID prefix to avoid name collisions."""
         if file_storage is None:
             raise ValueError("No file provided")
 
@@ -26,6 +29,7 @@ class StorageService:
         return str(target_path)
 
     def write_text(self, text: str, filename: str) -> str:
+        """Write intermediate text files (resume/JD/NLP) to temp directory."""
         target_path = Path(self.tmp_dir) / filename
         target_path.parent.mkdir(parents=True, exist_ok=True)
         with open(target_path, "w", encoding="utf-8") as file_obj:

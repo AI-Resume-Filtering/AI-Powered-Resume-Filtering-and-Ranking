@@ -1,4 +1,6 @@
+
 import { useNavigate } from "react-router-dom";
+import logo from "../../assets/project-logo.svg";
 
 function Sidebar({ active, setActive }) {
   const navigate = useNavigate();
@@ -10,7 +12,9 @@ function Sidebar({ active, setActive }) {
 
   return (
     <div className="sidebar">
-      <h2 className="logo">Company</h2>
+      <div className="sidebar-logo-container">
+        <img src={logo} alt="AI Resume Logo" className="sidebar-logo" />
+      </div>
 
       <button
         className={active === "home" ? "active" : ""}
@@ -52,6 +56,13 @@ function Sidebar({ active, setActive }) {
         onClick={() => setActive("emailtemplate")}
       >
         ✉️ Email Settings
+      </button>
+
+      <button
+        className={active === "scorethreshold" ? "active" : ""}
+        onClick={() => setActive("scorethreshold")}
+      >
+        🎯 Score Threshold
       </button>
 
       <button className="primary" onClick={handleLogout}>

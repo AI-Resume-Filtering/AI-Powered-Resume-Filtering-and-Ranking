@@ -146,9 +146,12 @@
     padding: 16px 14px;
     text-align: left;
     background: #1e293b;
-    color: #f8fafc;
-    font-size: 14px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     line-height: 1.4;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
 
 
@@ -158,6 +161,10 @@
     padding: 16px 14px;
     border-bottom: 1px solid #334155;
     vertical-align: middle;
+    color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.10);
 }
 
 .resumes-cell {
@@ -169,6 +176,8 @@
 .resumes-cell-file,
 .resumes-cell-email {
     font-size: 13px;
+    color: #e0e7ef;
+    font-weight: 500;
 }
 
 .resumes-file-name {
@@ -179,6 +188,8 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: default;
+    color: #38bdf8;
+    font-weight: 600;
 }
 
 .resumes-file-name::after {

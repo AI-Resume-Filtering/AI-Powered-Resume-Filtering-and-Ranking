@@ -1,216 +1,130 @@
-# Resume Parser Package
+# Resume Parser Module
 
-Parse PDF resumes and job descriptions from either the existing Samples folder layout or the updated data folder layout.
+Resume Parser is the ingestion layer that converts PDF documents into clean plain text.
 
----
+It supports both text-based PDFs and scanned/image-heavy PDFs through OCR fallback.
 
-## 📁 Supported Folder Structures
+## 1. Why this module exists
 
-```
-Project/
-├── Samples/                      ← Existing layout
-│   ├── Resumes/
-│   └── Job_Descriptions/
-│
-├── data/                         ← Updated layout also supported
-│   ├── resumes/
-│   └── job_descriptions/
-│
-├── Resume_Parser/                 ← This package
-│   ├── __init__.py
-│   ├── resume_parser.py          # PDF parser
-│   ├── text_cleaner.py           # Text cleaning
-│   ├── batch_parser.py           # Batch processing
-│   ├── parsed_resumes/           # Output (auto-created)
-│   │   ├── resume1.txt
-│   │   └── resume2.txt
-│   └── Parsed_JD/                # Output (auto-created)
-│       ├── jd1.txt
-│       └── jd2.txt
-│
-└── Nlp_Engine/                    ← Next module
-```
+Downstream NLP and AI scoring depend on text quality.
+Real-world resumes often contain:
+1. Mixed layouts.
+2. Tables and columns.
+3. Scanned pages with no selectable text.
+4. Embedded images and formatting artifacts.
 
----
+This module normalizes those inputs into readable text for reliable feature extraction.
 
-## 🚀 Usage
+## 2. What this module handles
 
-### Option 1: Parse Only
+1. Read resume and JD PDFs from supported folders.
+2. Extract text with pdfplumber for normal PDFs.
+3. Fallback to OCR for scanned content.
+4. Clean text before NLP stage.
+5. Batch process many files.
+6. Save consistent `.txt` outputs.
 
-```python
-from Resume_Parser import BatchParser
+## 3. File-by-file guide
 
-parser = BatchParser()
+1. `resume_parser.py`
+Purpose: main parser interface and extraction orchestration.
 
-# Parse all resumes and JDs
-result = parser.parse_all()
+2. `ocr_parser.py`
+Purpose: OCR pipeline for image/scanned pages.
+Uses: PyMuPDF rendering + OpenCV/Pillow preprocessing + Tesseract recognition.
 
-print(f"Parsed {result['resumes']['parsed']} resumes")
-print(f"Parsed {result['jds']['parsed']} JDs")
-```
+3. `text_cleaner.py`
+Purpose: remove noise, normalize whitespace, improve downstream NLP quality.
 
-### Option 2: Complete Pipeline
+4. `batch_parser.py`
+Purpose: process multiple resumes/JDs in one run and return summary counts.
 
-```bash
-python run_complete_pipeline.py
-```
+5. `requirements.txt`
+Purpose: module-specific dependency pointer for parser stack.
 
-This will:
-1. Parse PDFs from `Samples/` folder
-2. Extract data with NLP Engine
-3. Output ready for AI Scoring
+6. `__init__.py`
+Purpose: package exports for simple imports.
 
----
+## 4. Supported input folder layouts
 
-## 📦 Package Contents
+Layout option A:
+1. `Samples/Resumes/`
+2. `Samples/Job_Descriptions/`
 
-| File | Purpose |
-|------|---------|
-| `resume_parser.py` | Core PDF parser |
-| `text_cleaner.py` | Clean extracted text |
-| `batch_parser.py` | Process multiple files |
-| `__init__.py` | Package initialization |
+Layout option B:
+1. `data/resumes/`
+2. `data/job_descriptions/`
 
----
+## 5. Parsing flow in detail
 
-## ⚙️ How It Works
+1. Discover PDF files from supported input layout.
+2. For each file, attempt direct text extraction.
+3. If extracted text is weak/empty, trigger OCR fallback.
+4. Merge useful text blocks.
+5. Clean and normalize extracted text.
+6. Save output `.txt` files to parser output folders.
+7. Return summary metadata for success/failure counts.
 
-1. **Reads PDFs** from `Samples/Resumes` + `Samples/Job_Descriptions` or `data/resumes` + `data/job_descriptions`
-2. **Extracts text** using pdfplumber for text PDFs and tables
-3. **Falls back to OCR** using PyMuPDF + OpenCV + Tesseract for scanned pages and embedded images
-4. **Cleans text** (removes artifacts, normalizes)
-5. **Saves as .txt** in `Resume_Parser/parsed_resumes/` and `Resume_Parser/Parsed_JD/`
+## 6. Output contract
 
----
+Outputs are plain UTF-8 text files consumed by NLP Engine.
 
-## 🔧 Setup
+Typical outputs:
+1. Resume text files in parsed resume output directory.
+2. JD text files in parsed JD output directory.
+3. Batch summary dict containing parsed and failed counts.
 
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 7. Integration with NLP and scoring
 
-2. **Create one of the supported input layouts:**
-   ```bash
-   mkdir -p Samples/Resumes
-   mkdir -p Samples/Job_Descriptions
-   ```
+1. Resume Parser produces cleaned text files.
+2. NLP Engine reads those files and extracts structured features.
+3. AI Scoring ranks candidates using extracted features.
 
-   Or:
+Any parser extraction issue propagates to NLP/scoring quality, so this module is quality-critical.
 
-   ```bash
-   mkdir -p data/resumes
-   mkdir -p data/job_descriptions
-   ```
+## 8. Troubleshooting guide
 
-3. **Add PDF files:**
-   - Put resume PDFs in `Samples/Resumes/` or `data/resumes/`
-   - Put JD PDFs in `Samples/Job_Descriptions/` or `data/job_descriptions/`
+If parser finds no PDFs:
+1. Verify folder layout and file extension `.pdf`.
+2. Check file permissions.
 
-4. **Run:**
-   ```bash
-   python run_complete_pipeline.py
-   ```
+If OCR fails:
+1. Verify Tesseract is installed.
+2. Verify Tesseract binary is available in PATH.
+3. Verify OCR dependencies are installed from requirements.
 
----
+If output text quality is poor:
+1. Inspect scanned image quality.
+2. Adjust cleaning rules in `text_cleaner.py`.
+3. Add preprocessing in `ocr_parser.py` for noisy scans.
 
-## 📊 Output Format
+If parser is slow:
+1. Batch large files in smaller groups.
+2. Avoid repeated OCR on same files.
+3. Consider caching parse outputs for unchanged documents.
 
-**Parsed resume (text file):**
-```
-JOHN DOE
-Email: john@example.com
-Phone: 9876543210
+## 9. Performance and reliability notes
 
-TECHNICAL SKILLS
-Python, Java, React, MySQL
+1. OCR is expensive; direct extraction is preferred when available.
+2. Resume table parsing is important because skills often live inside tables.
+3. Cleaning stage should preserve semantics while removing artifacts.
 
-EXPERIENCE
-Software Developer - ABC Corp (2021-2024)
-Developed web applications
-```
+## 10. Recommended best practices
 
-**Parsed JD (text file):**
-```
-Job Title: Full Stack Developer
+1. Keep sample and production input folders separate.
+2. Track parse failures and review failed files regularly.
+3. Validate parser outputs before NLP upgrades.
 
-Required Skills:
-Python, Java, React, MySQL, Spring Boot
+## 11. Interview questions and answers
 
-Minimum Experience: 2 years
-Education: Bachelor's degree
-```
+1. Why combine direct extraction and OCR?
+Answer: direct extraction is faster and cleaner for digital PDFs, OCR handles scanned/image-only documents.
 
----
+2. Why is text cleaning required before NLP?
+Answer: normalization reduces noise and improves section/skill extraction reliability.
 
-## ✅ Verification
+3. What is the biggest risk in resume parsing?
+Answer: poor extraction causes downstream false negatives in matching and ranking.
 
-Check parsed files:
-
-```bash
-# Check parsed resumes
-ls Resume_Parser/parsed_resumes/
-
-# Check parsed JDs
-ls Resume_Parser/Parsed_JD/
-
-# View a parsed file
-cat Resume_Parser/parsed_resumes/resume1.txt
-```
-
----
-
-## 🔗 Integration
-
-Parsed files are automatically used by NLP Engine:
-
-```python
-from Resume_Parser import BatchParser
-from Nlp_Engine import process_resumes
-
-# Step 1: Parse
-parser = BatchParser()
-parse_result = parser.parse_all()
-
-# Step 2: Get paths
-jd_path = f"{parse_result['jds']['output_folder']}/{parse_result['jds']['files'][0]}"
-resume_paths = [
-    f"{parse_result['resumes']['output_folder']}/{f}"
-    for f in parse_result['resumes']['files']
-]
-
-# Step 3: NLP Extract
-nlp_result = process_resumes(jd_path, resume_paths)
-```
-
----
-
-## 🐛 Troubleshooting
-
-**Error: input folder not found**
-```bash
-# Create one supported layout
-mkdir -p Samples/Resumes
-mkdir -p Samples/Job_Descriptions
-```
-
-**Error: No PDF files found**
-- Add PDF files to the detected input folders shown by `BatchParser`
-
-**Error: OCR dependencies missing**
-```bash
-pip install -r requirements.txt
-```
-
-**Error: Tesseract not found**
-- Install Tesseract OCR and ensure `tesseract.exe` is on PATH, or set `pytesseract.pytesseract.tesseract_cmd`
-
----
-
-## 📝 Notes
-
-- Only PDF files are supported currently
-- Output text files are UTF-8 encoded
-- Cleaned text removes artifacts and normalizes formatting
-- Scanned PDFs no longer require Poppler because OCR uses PyMuPDF rendering
-- Output folders are auto-created inside Resume_Parser package
+4. How do you make parser robust in production?
+Answer: use fallback extraction paths, batch-level summaries, and per-file failure diagnostics.

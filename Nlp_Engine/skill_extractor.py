@@ -85,14 +85,3 @@ def _match_skill(text: str, skill: str, synonyms: list) -> tuple:
     return False, 0.0
 
 
-# Quick test
-if __name__ == "__main__":
-    test_text = """
-    Programming Languages: Java, Python, C++
-    AI/ML: Machine Learning, NLP, OpenCV
-    Databases: MySQL, MongoDB
-    """
-
-    result = extract_skills(test_text)
-    print(f"Skills Found: {result['skills_list']}")
-    print(f"\nBy Category: {result['skills_by_category']}")

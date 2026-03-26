@@ -1,19 +1,16 @@
-/* ===================== Reset ===================== */
+/* ===================== Landing Page ===================== */
 
-* {
-    margin: 0;
-    padding: 0;
+.landing-page,
+.landing-page * {
     box-sizing: border-box;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-
-/* ===================== Body ===================== */
-
-body {
+.landing-page {
     min-height: 100vh;
+    width: 100%;
     background: #0b1220;
-    /* dark background */
+    padding: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,13 +20,12 @@ body {
 
 /* ===================== Container ===================== */
 
-.container {
-    width: 450px;
-    max-width: 95%;
+.landing-container {
+    width: min(460px, 95vw);
     background-color: #1e1e2f;
     /* dark card */
     color: #ffffff;
-    padding: 40px 30px;
+    padding: clamp(18px, 4vw, 40px) clamp(14px, 4vw, 30px);
     border-radius: 12px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
     border-top: 6px solid #0ea5e9;
@@ -42,11 +38,81 @@ body {
 
 /* ===================== Heading ===================== */
 
-.container h2 {
-    font-size: 26px;
+.landing-container h2 {
+    font-size: clamp(20px, 5.5vw, 26px);
     color: #ffffff;
     font-weight: 700;
     letter-spacing: 0.5px;
+}
+
+
+/* ===================== Brand ===================== */
+
+.brand-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+}
+
+/* Dynamic animated glow behind logo */
+.brand-logo-glow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 60% 40%, #38bdf8 0%, #0ea5e9 40%, #0f172a 100%);
+    filter: blur(32px) brightness(1.2);
+    opacity: 0.7;
+    animation: brand-glow-animate 4s linear infinite alternate;
+}
+
+@keyframes brand-glow-animate {
+    0% {
+        filter: blur(32px) brightness(1.2) hue-rotate(0deg);
+        opacity: 0.7;
+    }
+    50% {
+        filter: blur(40px) brightness(1.4) hue-rotate(30deg);
+        opacity: 1;
+    }
+    100% {
+        filter: blur(32px) brightness(1.2) hue-rotate(0deg);
+        opacity: 0.7;
+    }
+}
+
+.brand-logo {
+    width: clamp(120px, 32vw, 180px);
+    height: auto;
+    height: clamp(120px, 32vw, 180px);
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #38bdf8;
+    box-shadow: 0 2px 16px rgba(56, 189, 248, 0.18);
+    background: #0f172a;
+    padding: 6px;
+    transition: box-shadow 0.2s;
+}
+
+.brand-tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #38bdf8;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.project-summary {
+    text-align: left;
+    font-size: clamp(13px, 3.3vw, 14px);
+    line-height: 1.6;
+    color: #cbd5e1;
 }
 
 
@@ -62,12 +128,13 @@ body {
 
 .role-buttons {
     display: flex;
-    gap: 15px;
-    margin-top: 15px;
+    gap: 12px;
+    margin-top: 12px;
 }
 
 .role-buttons button {
     flex: 1;
+    min-height: 44px;
     padding: 12px 0;
     font-size: 15px;
     font-weight: 600;
@@ -87,6 +154,24 @@ body {
 }
 
 
+.about-button {
+    width: 100%;
+    padding: 11px 0;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.7);
+    color: #e2e8f0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.about-button:hover {
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+
+
 /* ===================== Footer Text ===================== */
 
 .footer-text {
@@ -96,10 +181,73 @@ body {
 }
 
 
+@media (min-width: 768px) and (max-width: 1024px) {
+    .landing-page {
+        padding: 24px;
+    }
+
+    .landing-container {
+        width: min(700px, 92vw);
+        border-radius: 16px;
+        padding: 28px 28px;
+        gap: 18px;
+    }
+
+    .brand-header {
+        gap: 18px;
+    }
+
+    .brand-logo {
+        width: clamp(160px, 22vw, 210px);
+    }
+
+    .landing-container h2 {
+        font-size: clamp(26px, 3vw, 32px);
+    }
+
+    .project-summary {
+        font-size: 15px;
+    }
+
+    .choose-role {
+        font-size: 16px;
+    }
+
+    .role-buttons {
+        gap: 14px;
+    }
+
+    .role-buttons button,
+    .about-button {
+        min-height: 48px;
+        font-size: 15px;
+    }
+}
+
+
 /* ===================== Responsive ===================== */
 
-@media (max-width: 500px) {
+@media (max-width: 640px) {
+    .landing-page {
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .landing-container {
+        width: 100%;
+        margin: 8px 0;
+    }
+
     .role-buttons {
         flex-direction: column;
+    }
+
+    .brand-header {
+        text-align: center;
+        flex-direction: column;
+    }
+
+    .project-summary {
+        text-align: center;
     }
 }

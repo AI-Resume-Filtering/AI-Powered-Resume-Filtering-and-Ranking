@@ -98,15 +98,18 @@ function CompanyHistory({ company }) {
         </select>
       </div>
 
-      {/* Job Stats */}
-      <div className="ch-job-cards">
+
+      {/* Job Stats - visually separated cards */}
+      <div className="ch-job-cards" style={{ display: 'flex', gap: '32px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 32 }}>
         {!loading && filteredJobStats.length > 0
           ? filteredJobStats.map((job, idx) => (
-              <div key={idx} className="ch-job-card">
-                <h3>{job.jobTitle}</h3>
-                <p>Total: {job.total}</p>
-                <p>Selected: {job.selected}</p>
-                <p>Rejected: {job.rejected}</p>
+              <div key={idx} className="ch-job-card" style={{ minWidth: 220, maxWidth: 320, background: 'linear-gradient(135deg, #1e293b, #0f172a)', borderRadius: 16, boxShadow: '0 10px 25px rgba(0,0,0,0.12)', padding: 24, margin: '0 8px', textAlign: 'center', border: '1px solid #334155' }}>
+                <h3 style={{ fontSize: 22, fontWeight: 700, color: '#f8fafc', marginBottom: 16 }}>{job.jobTitle}</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
+                  <span style={{ color: '#e2e8f0', fontWeight: 600 }}>Total: <span style={{ color: '#38bdf8' }}>{job.total}</span></span>
+                  <span style={{ color: '#e2e8f0', fontWeight: 600 }}>Selected: <span className="status-selected">{job.selected}</span></span>
+                  <span style={{ color: '#e2e8f0', fontWeight: 600 }}>Rejected: <span className="status-rejected">{job.rejected}</span></span>
+                </div>
               </div>
             ))
           : Array.from({ length: 3 }).map((_, i) => (
@@ -159,7 +162,12 @@ function CompanyHistory({ company }) {
                     <td>{h.jobTitle}</td>
                     <td>{h.score ?? "-"}</td>
                     <td>{h.rank ?? "-"}</td>
-                    <td className={`ch-status-${(h.status || "unknown").toLowerCase()}`}>{h.status || "unknown"}</td>
+                    <td className={
+                      h.status === 'Rejected' ? 'status-rejected' :
+                      h.status === 'Selected' ? 'status-selected' : ''
+                    }>
+                      {h.status || "unknown"}
+                    </td>
                     <td>{h.date}</td>
                     <td>
                       {h.resumeUrl ? <a href={resolveResumeUrl(h.resumeUrl)} target="_blank" rel="noreferrer">Download</a> : "-"}

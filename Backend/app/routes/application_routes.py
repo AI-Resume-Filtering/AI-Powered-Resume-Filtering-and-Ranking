@@ -13,6 +13,9 @@ from ..services.email_service import EmailService
 from ..services.job_service import JobService
 from ..utils.auth_middleware import require_auth
 from ..utils.validators import validate_candidate_form
+from ..utils.resume_validator import validate_resume_content
+
+from Ai_Scoring.Ai_Scoring.model_trainer import maybe_retrain_model
 
 application_bp = Blueprint("application", __name__)
 logger = logging.getLogger(__name__)
@@ -52,6 +55,11 @@ def _run_pipeline_in_background(flask_app, db, pipeline, job, candidate, resume_
                 {"applicationId": application_id},
                 {"$set": {
                     "score": result["score"],
+                    "semanticScore": result.get("semanticScore", 0.0),
+                    "experienceScore": result.get("experienceScore", 0.0),
+                    "educationScore": result.get("educationScore", 0.0),
+                    "blendedScore": result.get("blendedScore", 0.0),
+                    "scoreSource": result.get("scoreSource", "blended"),
                     "status": result["status"],
                     "emailSent": result["emailSent"],
                     "nlpOutputPath": result.get("nlpOutputPath"),
@@ -127,6 +135,15 @@ def apply_for_job():
         logger.exception("Failed to save resume file")
         return jsonify({"success": False, "message": "Could not save resume. Please try again."}), 500
 
+    # Validate that the uploaded PDF is actually a resume (text length + keyword check)
+    is_resume, rejection_reason = validate_resume_content(resume_pdf_path)
+    if not is_resume:
+        try:
+            os.remove(resume_pdf_path)
+        except Exception:
+            pass
+        return jsonify({"success": False, "message": rejection_reason}), 400
+
     application_id = uuid.uuid4().hex
     candidate["applicationId"] = application_id
 
@@ -161,11 +178,23 @@ def apply_for_job():
         current_app.config["SMTP_FROM"],
         current_app.config["SMTP_TLS"],
     )
+
+    company_threshold = current_app.config["SCORE_THRESHOLD"]
+    try:
+        company_doc = current_app.mongo_db["companies"].find_one(
+            {"companyId": job.get("companyId")},
+            {"scoreThreshold": 1, "_id": 0},
+        )
+        if company_doc and company_doc.get("scoreThreshold") is not None:
+            company_threshold = float(company_doc.get("scoreThreshold"))
+    except Exception:
+        logger.warning("Could not resolve company score threshold, falling back to global threshold", exc_info=True)
+
     pipeline = PipelineService(
         storage,
         email_svc,
         project_root=current_app.config["PROJECT_ROOT"],
-        score_threshold=current_app.config["SCORE_THRESHOLD"],
+        score_threshold=company_threshold,
         db=current_app.mongo_db,
     )
 
@@ -283,3 +312,82 @@ def download_resume(application_id):
         return jsonify({"message": "Resume file missing"}), 404
 
     return send_file(resume_path, as_attachment=True)
+
+
+@application_bp.route("/feedback", methods=["POST"])
+def save_feedback():
+    payload = request.get_json(silent=True) or {}
+
+    required_fields = [
+        "resume_id",
+        "job_id",
+        "semantic_score",
+        "experience_score",
+        "education_score",
+        "selected",
+    ]
+    missing = [f for f in required_fields if f not in payload]
+    if missing:
+        return jsonify({
+            "success": False,
+            "message": f"Missing required fields: {', '.join(missing)}",
+        }), 400
+
+    resume_id = str(payload.get("resume_id", "")).strip()
+    job_id = str(payload.get("job_id", "")).strip()
+    if not resume_id or not job_id:
+        return jsonify({"success": False, "message": "resume_id and job_id are required"}), 400
+
+    try:
+        semantic_score = float(payload.get("semantic_score"))
+        experience_score = float(payload.get("experience_score"))
+        education_score = float(payload.get("education_score"))
+    except (TypeError, ValueError):
+        return jsonify({
+            "success": False,
+            "message": "semantic_score, experience_score, and education_score must be numeric",
+        }), 400
+
+    if not (0.0 <= semantic_score <= 1.0):
+        return jsonify({"success": False, "message": "semantic_score must be between 0 and 1"}), 400
+    if not (0.0 <= experience_score <= 100.0):
+        return jsonify({"success": False, "message": "experience_score must be between 0 and 100"}), 400
+    if not (0.0 <= education_score <= 100.0):
+        return jsonify({"success": False, "message": "education_score must be between 0 and 100"}), 400
+
+    selected_value = payload.get("selected")
+    if isinstance(selected_value, bool):
+        selected = selected_value
+    else:
+        selected_str = str(selected_value).strip().lower()
+        if selected_str in {"1", "true", "yes", "selected"}:
+            selected = True
+        elif selected_str in {"0", "false", "no", "rejected"}:
+            selected = False
+        else:
+            return jsonify({"success": False, "message": "selected must be boolean"}), 400
+
+    doc = {
+        "resume_id": resume_id,
+        "job_id": job_id,
+        "semantic_score": semantic_score,
+        "experience_score": experience_score,
+        "education_score": education_score,
+        "selected": selected,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+    current_app.mongo_db["feedback"].insert_one(doc)
+
+    retrain_threshold = int(current_app.config.get("FEEDBACK_RETRAIN_THRESHOLD", 50))
+    min_samples = int(current_app.config.get("FEEDBACK_MIN_TRAIN_SAMPLES", 20))
+    retrain_result = maybe_retrain_model(
+        current_app.mongo_db,
+        retrain_threshold=retrain_threshold,
+        min_samples=min_samples,
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "Feedback stored successfully",
+        "retrain": retrain_result,
+    }), 201

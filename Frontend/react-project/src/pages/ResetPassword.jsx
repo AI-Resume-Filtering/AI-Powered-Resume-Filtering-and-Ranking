@@ -122,43 +122,45 @@ function ResetPassword() {
   };
 
   return (
-    <div className="forgot-container">
-      <div className="forgot-left">
-        <div className="logo-box">🔐</div>
-        <h1>Create New Password</h1>
-        <p>Set a strong password to secure your company account.</p>
-      </div>
+    <div className="forgot-page">
+      <div className="forgot-container">
+        <div className="forgot-left">
+          <div className="logo-box">🔐</div>
+          <h1>Create New Password</h1>
+          <p>Set a strong password to secure your company account.</p>
+        </div>
 
-      <div className="forgot-right">
-        <div className="forgot-card">
-          <h2>Reset Password</h2>
+        <div className="forgot-right">
+          <div className="forgot-card">
+            <h2>Reset Password</h2>
 
-          <label>New Password</label>
-          <input
-            type="password"
-            placeholder="Enter new password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={validating || !isTokenValid || loading}
-          />
+            <label>New Password</label>
+            <input
+              type="password"
+              placeholder="Enter new password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={validating || !isTokenValid || loading}
+            />
 
-          <label>Confirm Password</label>
-          <input
-            type="password"
-            placeholder="Confirm new password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={validating || !isTokenValid || loading}
-          />
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={validating || !isTokenValid || loading}
+            />
 
-          <button onClick={handleReset} className="primary" disabled={loading || validating || !isTokenValid}>
-            {validating ? "Verifying link..." : (loading ? "Updating..." : "Update Password")}
-          </button>
+            <button onClick={handleReset} className="primary" disabled={loading || validating || !isTokenValid}>
+              {validating ? "Verifying link..." : (loading ? "Updating..." : "Update Password")}
+            </button>
 
-          {message && <p className={`forgot-msg ${isError ? "error" : "success"}`}>{message}</p>}
+            {message && <p className={`forgot-msg ${isError ? "error" : "success"}`}>{message}</p>}
 
-          <div className="links">
-            <Link to="/company-login">Back to Login</Link>
+            <div className="links">
+              <Link to="/company-login">Back to Login</Link>
+            </div>
           </div>
         </div>
       </div>

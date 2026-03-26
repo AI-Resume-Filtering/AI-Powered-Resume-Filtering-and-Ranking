@@ -34,8 +34,6 @@ wheels/
 ## Output files (keep folder structure, ignore generated files)
 Nlp_Engine/output/*.json
 Nlp_Engine/output/*.log
-!Nlp_Engine/output/README.md
-
 # Logs
 *.log
 
@@ -58,7 +56,9 @@ mongodb-data/
 mongodb-log/
 
 # Environment files
-.env.
+.env*
+
+
 
 # Backend local runtime state
 Backend/instance/
@@ -68,3 +68,4 @@ Frontend/react-project/node_modules/
 Frontend/react-project/build/
 Frontend/react-project/dist/
 Frontend/instance/
+

@@ -1,4 +1,11 @@
 import os
+from datetime import datetime
+from functools import lru_cache
+
+try:
+    import joblib
+except ImportError:
+    joblib = None
 
 try:
     from .config import SCORING_PROFILES, EDUCATION_RANKING, EXP_THRESHOLDS
@@ -18,7 +25,48 @@ def get_adaptive_weights(job_reqs: dict) -> dict:
         return SCORING_PROFILES["MID_LEVEL"]
 
 
-def score_resume(resume_raw: dict, metadata: dict) -> float:
+def _clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
+def _calculate_experience_score(resume: dict, job_reqs: dict) -> float:
+    years = float(resume.get("experience_years", 0) or 0)
+    req_exp = float(job_reqs.get("minimum_experience", 0) or 0)
+    if req_exp <= 0:
+        return 100.0 if years > 0 else 80.0
+    return _clamp((years / req_exp) * 100.0, 0.0, 100.0)
+
+
+def _calculate_education_score(resume: dict, job_reqs: dict) -> float:
+    req_edu = job_reqs.get("required_education", "bachelors")
+    cand_edu = resume.get("education_level", "")
+    req_rank = EDUCATION_RANKING.get(parse_education_level(req_edu), 3)
+    cand_rank = EDUCATION_RANKING.get(parse_education_level(cand_edu), 0)
+    if cand_rank >= req_rank:
+        return 100.0
+    if req_rank <= 0:
+        return 0.0
+    return _clamp((cand_rank / req_rank) * 100.0, 0.0, 100.0)
+
+
+@lru_cache(maxsize=1)
+def _load_model_bundle(model_path: str):
+    if not joblib or not os.path.exists(model_path):
+        return None
+    try:
+        bundle = joblib.load(model_path)
+        if isinstance(bundle, dict) and bundle.get("model") is not None:
+            return bundle
+    except Exception:
+        return None
+    return None
+
+
+def clear_model_cache() -> None:
+    _load_model_bundle.cache_clear()
+
+
+def score_resume(resume_raw: dict, metadata: dict, return_details: bool = False):
     """
     Calculate weighted score for a single resume.
 
@@ -33,52 +81,61 @@ def score_resume(resume_raw: dict, metadata: dict) -> float:
     """
     resume = standardize_resume_data(resume_raw)
     job_reqs = metadata.get("job_requirements", metadata)
-    weights = get_adaptive_weights(job_reqs)
+    model_path = metadata.get("model_path") or os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "model.pkl"
+    )
 
-    # --- METRIC 1: Skill Match ---
-    match_pct = resume.get("job_match", {}).get("match_percentage", 0)
-    skill_score = (match_pct / 100) * weights["skill_match"]
 
-    # --- METRIC 2: Total Experience ---
-    years = resume.get("experience_years", 0)
-    req_exp = job_reqs.get("minimum_experience", 0)
-    exp_ratio = 1.0 if req_exp == 0 else min(years / req_exp, 1.5)
-    exp_score = min(exp_ratio * weights["experience"], weights["experience"])
+    semantic_score = float(metadata.get("semantic_score", 0.0) or 0.0)
+    semantic_score = _clamp(semantic_score, 0.0, 1.0)
+    experience_score = _calculate_experience_score(resume, job_reqs)
+    education_score = _calculate_education_score(resume, job_reqs)
 
-    # --- METRIC 3: Education ---
-    req_edu = job_reqs.get("required_education", "bachelors")
-    cand_edu = resume.get("education_level", "")
-    req_rank = EDUCATION_RANKING.get(parse_education_level(req_edu), 3)
-    cand_rank = EDUCATION_RANKING.get(parse_education_level(cand_edu), 0)
-    edu_score = weights["education"] if cand_rank >= req_rank else 0
+    # --- Required Skills Strict Matching ---
+    required_skills = set([s.lower() for s in job_reqs.get("required_skills", [])])
+    resume_skills = set([s.lower() for s in resume.get("skills", [])])
+    matched_skills = required_skills.intersection(resume_skills)
+    required_skills_match_pct = (len(matched_skills) / len(required_skills)) * 100 if required_skills else 0
 
-    # --- METRIC 4: Preferred Skills ---
-    pref_list = [s.lower() for s in job_reqs.get("preferred_skills", [])]
-    cand_skills = [s.lower() for s in resume.get("skills", [])]
-    matched_pref = set(pref_list) & set(cand_skills)
-    pref_score = min(len(matched_pref) * 2, weights["preferred_skills"])
+    # Penalize if any required skill is missing
+    missing_required = len(matched_skills) < len(required_skills)
+    penalty = 0.0
+    if missing_required:
+        penalty = 30.0  # Cap or subtract from score if required skills missing
 
-    # --- METRIC 5: Skill-wise Experience Bonus ---
-    # Rewards candidates with documented years of experience in required skills.
-    # Max 5 points — creates meaningful separation beyond simple skill presence.
-    skill_experience = resume.get("skill_experience", {})
-    required_skills = [s.lower() for s in job_reqs.get("required_skills", [])]
-    skill_exp_bonus = 0.0
+    # Adjusted weights: semantic 40%, experience 20%, education 20%, required skills 20%
+    blended_score = (
+        0.4 * (semantic_score * 100.0) +
+        0.2 * experience_score +
+        0.2 * education_score +
+        0.2 * required_skills_match_pct
+    )
+    final_score = _clamp(blended_score - penalty, 0.0, 100.0)
+    score_source = "blended-strict"
 
-    if skill_experience and required_skills:
-        matched_exp_years = sum(
-            v for k, v in skill_experience.items()
-            if k.lower() in required_skills
-        )
-        # Normalize against expected total skill-years
-        expected = max(req_exp, 1) * max(len(required_skills), 1)
-        skill_exp_bonus = min(matched_exp_years / expected, 1.0) * 5.0
+    model_bundle = _load_model_bundle(model_path)
+    if model_bundle is not None:
+        model = model_bundle.get("model")
+        try:
+            proba = model.predict_proba([[semantic_score, experience_score, education_score]])
+            if len(proba[0]) > 1:
+                final_score = _clamp(float(proba[0][1]) * 100.0, 0.0, 100.0)
+                score_source = "ml"
+        except Exception:
+            score_source = "blended"
 
-    final_score = skill_score + exp_score + edu_score + pref_score + skill_exp_bonus
-    # L12: The skill_exp_bonus is an extra up-to-5-point reward on top of the
-    # 100-point base. Cap the total at 100 so the score remains on a consistent
-    # 0-100 scale and SCORE_THRESHOLD comparisons stay meaningful.
-    return round(min(final_score, 100.0), 4)
+    details = {
+        "semantic_score": round(semantic_score, 6),
+        "experience_score": round(experience_score, 4),
+        "education_score": round(education_score, 4),
+        "blended_score": round(blended_score, 4),
+        "score_source": score_source,
+        "scored_at": datetime.utcnow().isoformat(),
+    }
+
+    if return_details:
+        return round(final_score, 4), details
+    return round(final_score, 4)
 
 
 def process_resume_batch(filename: str, backend_metadata: dict) -> list:
@@ -115,7 +172,7 @@ def process_resume_batch(filename: str, backend_metadata: dict) -> list:
         if not res_data.get("scoring_ready", False):
             continue
 
-        final_score = score_resume(res_data, backend_metadata)
+        final_score, score_details = score_resume(res_data, backend_metadata, return_details=True)
         results.append({
             "resume_id": res_id,
             "filename": res_data.get("resume_filename", "Unknown"),
@@ -123,7 +180,12 @@ def process_resume_batch(filename: str, backend_metadata: dict) -> list:
             "total_score": final_score,
             "details": {
                 "experience_years": res_data.get("experience_years", 0),
-                "skills_match": res_data.get("job_match", {}).get("match_percentage", 0)
+                "skills_match": res_data.get("job_match", {}).get("match_percentage", 0),
+                "semantic_score": score_details.get("semantic_score", 0.0),
+                "experience_score": score_details.get("experience_score", 0.0),
+                "education_score": score_details.get("education_score", 0.0),
+                "blended_score": score_details.get("blended_score", 0.0),
+                "score_source": score_details.get("score_source", "blended"),
             }
         })
 

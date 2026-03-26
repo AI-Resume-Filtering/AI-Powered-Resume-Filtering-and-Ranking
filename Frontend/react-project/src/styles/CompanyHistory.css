@@ -1,3 +1,37 @@
+.ch-job-stats {
+    margin-bottom: 18px;
+    text-align: center;
+}
+.ch-job-stats p {
+    color: #38bdf8;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 4px 0;
+    letter-spacing: 0.01em;
+    background: none;
+    display: block;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+.ch-job-stats strong {
+    color: #38bdf8;
+    font-weight: 800;
+}
+/* High-contrast labels for job stats and cards */
+.ch-job-card strong,
+.ch-history-table th,
+.ch-history-table td strong,
+.ch-latest-resumes strong {
+    color: #38bdf8;
+    font-weight: 700;
+    background: none;
+    letter-spacing: 0.01em;
+}
+.ch-job-card a,
+.ch-history-table a {
+    color: #38bdf8;
+    font-weight: 600;
+    text-decoration: underline;
+}
 .ch-wrapper {
     width: 100%;
     min-height: 80vh;
@@ -35,18 +69,21 @@
 
 .ch-job-cards {
     display: flex;
-    gap: 30px;
-    margin-bottom: 45px;
-    justify-content: center;
-    flex-wrap: wrap;
+.ch-status-selected {
+    color: #22c55e;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.10);
 }
-
-.ch-job-card {
-    flex: 1 1 250px;
-    min-width: 250px;
-    max-width: 320px;
-    padding: 25px;
-    background: linear-gradient(135deg, #1e293b, #0f172a);
+.ch-status-rejected {
+    color: #ef4444;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+}
+.ch-status-pending {
+    color: #f59e42;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+}
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
     min-height: 180px;

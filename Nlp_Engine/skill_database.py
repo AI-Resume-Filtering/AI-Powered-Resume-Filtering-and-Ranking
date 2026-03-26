@@ -19,6 +19,45 @@ Categories:
 
 SKILL_DATABASE = {
 
+    # --- MECHANICAL ENGINEERING ---
+    "thermodynamics": {"category": "mechanical_engineering", "synonyms": ["heat transfer", "thermal analysis"], "importance": "high"},
+    "fluid mechanics": {"category": "mechanical_engineering", "synonyms": ["hydraulics", "fluid dynamics"], "importance": "high"},
+    "autocad": {"category": "mechanical_engineering", "synonyms": ["auto cad"], "importance": "high"},
+    "solidworks": {"category": "mechanical_engineering", "synonyms": [], "importance": "high"},
+    "manufacturing": {"category": "mechanical_engineering", "synonyms": ["production engineering"], "importance": "medium"},
+
+    # --- CIVIL ENGINEERING ---
+    "structural analysis": {"category": "civil_engineering", "synonyms": ["structure analysis"], "importance": "high"},
+    "autocad civil": {"category": "civil_engineering", "synonyms": ["civil autocad"], "importance": "high"},
+    "staad pro": {"category": "civil_engineering", "synonyms": ["staad"], "importance": "medium"},
+    "surveying": {"category": "civil_engineering", "synonyms": ["land surveying"], "importance": "medium"},
+
+    # --- ELECTRICAL ENGINEERING ---
+    "power systems": {"category": "electrical_engineering", "synonyms": ["power engineering"], "importance": "high"},
+    "matlab": {"category": "electrical_engineering", "synonyms": [], "importance": "high"},
+    "circuit analysis": {"category": "electrical_engineering", "synonyms": ["circuit design"], "importance": "high"},
+
+    # --- COMMERCE/FINANCE ---
+    "accounting": {"category": "commerce", "synonyms": ["accounts", "accountancy"], "importance": "high"},
+    "taxation": {"category": "commerce", "synonyms": ["tax"], "importance": "medium"},
+    "auditing": {"category": "commerce", "synonyms": ["audit"], "importance": "medium"},
+    "tally": {"category": "commerce", "synonyms": [], "importance": "medium"},
+
+    # --- LAW ---
+    "legal research": {"category": "law", "synonyms": ["case research"], "importance": "high"},
+    "contract law": {"category": "law", "synonyms": ["contracts"], "importance": "high"},
+    "litigation": {"category": "law", "synonyms": [], "importance": "medium"},
+
+    # --- MEDICINE ---
+    "pharmacology": {"category": "medicine", "synonyms": ["pharma"], "importance": "high"},
+    "clinical research": {"category": "medicine", "synonyms": [], "importance": "medium"},
+    "diagnosis": {"category": "medicine", "synonyms": ["medical diagnosis"], "importance": "high"},
+
+    # --- ARTS ---
+    "graphic design": {"category": "arts", "synonyms": ["visual design"], "importance": "medium"},
+    "creative writing": {"category": "arts", "synonyms": ["content writing"], "importance": "medium"},
+    "fine arts": {"category": "arts", "synonyms": [], "importance": "medium"},
+
     # ========================================
     # PROGRAMMING LANGUAGES
     # ========================================

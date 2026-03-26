@@ -230,6 +230,7 @@ def register_company():
             registration_no=payload["registrationNo"],
             email=payload["email"],
             password=payload["password"],
+            score_threshold=float(payload.get("scoreThreshold", current_app.config.get("SCORE_THRESHOLD", 70))),
         )
 
         if not result.get("success"):
@@ -481,3 +482,45 @@ def save_email_template(company_id):
     except Exception:
         logger.exception("Error saving email template for company %s", company_id)
         return jsonify({"success": False, "message": "Could not save template"}), 500
+
+
+@company_bp.route("/company/<company_id>/score-threshold", methods=["GET"])
+@require_auth
+def get_company_score_threshold(company_id):
+    """Get company-specific candidate selection threshold (0-100)."""
+    try:
+        service = CompanyService(current_app.mongo_db)
+        value = service.get_score_threshold(company_id)
+        if value is None:
+            value = float(current_app.config.get("SCORE_THRESHOLD", 70))
+        return jsonify({"success": True, "scoreThreshold": value}), 200
+    except Exception:
+        logger.exception("Error fetching score threshold for company %s", company_id)
+        return jsonify({"success": False, "message": "Could not fetch score threshold"}), 500
+
+
+@company_bp.route("/company/<company_id>/score-threshold", methods=["POST"])
+@require_auth
+def save_company_score_threshold(company_id):
+    """Save company-specific candidate selection threshold (0-100)."""
+    try:
+        payload = request.get_json(silent=True) or {}
+        raw = payload.get("scoreThreshold", None)
+        if raw is None:
+            return jsonify({"success": False, "message": "scoreThreshold is required"}), 400
+
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            return jsonify({"success": False, "message": "scoreThreshold must be numeric"}), 400
+
+        if value < 0 or value > 100:
+            return jsonify({"success": False, "message": "scoreThreshold must be between 0 and 100"}), 400
+
+        service = CompanyService(current_app.mongo_db)
+        result = service.save_score_threshold(company_id, value)
+        status = 200 if result.get("success") else 404
+        return jsonify(result), status
+    except Exception:
+        logger.exception("Error saving score threshold for company %s", company_id)
+        return jsonify({"success": False, "message": "Could not save score threshold"}), 500

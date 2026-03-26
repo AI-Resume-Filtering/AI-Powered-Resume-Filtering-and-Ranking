@@ -25,11 +25,27 @@ class JobService:
         return self._parser
 
     def create_job(self, company: dict, job_title: str, jd_file) -> dict:
+        import hashlib
+        from .jd_deduplicator import JobDescriptionDeduplicator
         if not self.storage:
             raise RuntimeError("Storage service not configured")
 
         pdf_path = self.storage.save_upload(jd_file, "job_descriptions")
         description_text = self._resume_parser.parse(pdf_path)
+
+        # --- Semantic Job Description Deduplication ---
+        dedup = JobDescriptionDeduplicator(self.collection)
+        similar_job_id, similarity = dedup.find_similar(description_text)
+        if similar_job_id:
+            existing_job = self.collection.find_one({"jobId": similar_job_id})
+            if existing_job:
+                return existing_job
+
+        # Fallback: hash-based deduplication for exact matches (legacy)
+        jd_hash = hashlib.sha256(description_text.strip().encode("utf-8")).hexdigest()
+        existing_job = self.collection.find_one({"jd_hash": jd_hash, "companyId": company.get("companyId")})
+        if existing_job:
+            return existing_job
 
         job_id = uuid.uuid4().hex
         job = {
@@ -45,9 +61,15 @@ class JobService:
             "experience": "",
             "status": "active",  # A4: job lifecycle field
             "postDate": datetime.utcnow().isoformat(),
+            "jd_hash": jd_hash,  # Store hash for deduplication
         }
 
         self.collection.insert_one(job)
+
+        # Store embedding for future deduplication
+        embedding = dedup.compute_embedding(description_text)
+        dedup.store_embedding(job_id, embedding)
+
         return job
 
     def get_job(self, job_id: str) -> dict:

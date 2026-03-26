@@ -9,7 +9,8 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from Ai_Scoring.Ai_Scoring.scorer import process_resume_batchcd
+from Ai_Scoring.Ai_Scoring.scorer import process_resume_batch
+from Ai_Scoring.Ai_Scoring.semantic_matcher import semantic_similarity_score
 from Nlp_Engine.Nlp_service import process_resumes
 from Resume_Parser.resume_parser import ResumeParser
 
@@ -74,7 +75,11 @@ class PipelineService:
             output_data = json.load(fh)
 
         job_requirements = output_data.get("job_requirements", {})
-        scoring_metadata = {"job_requirements": job_requirements}
+        semantic_score = semantic_similarity_score(resume_text, jd_text)
+        scoring_metadata = {
+            "job_requirements": job_requirements,
+            "semantic_score": semantic_score,
+        }
 
         logger.info("Running AI scoring for application %s", candidate["applicationId"])
         scored_results = process_resume_batch(output_file.name, scoring_metadata)
@@ -91,6 +96,7 @@ class PipelineService:
 
         result = scored_results[0]
         score = float(result.get("total_score", 0))
+        score_details = result.get("details", {})
         status = "Selected" if score >= self.score_threshold else "Rejected"
 
         email_sent = False
@@ -106,6 +112,11 @@ class PipelineService:
             "resumeTextPath": resume_txt_path,
             "nlpOutputPath": output_path,
             "score": score,
+            "semanticScore": float(score_details.get("semantic_score", semantic_score)),
+            "experienceScore": float(score_details.get("experience_score", 0.0)),
+            "educationScore": float(score_details.get("education_score", 0.0)),
+            "blendedScore": float(score_details.get("blended_score", 0.0)),
+            "scoreSource": score_details.get("score_source", "blended"),
             "status": status,
             "emailSent": email_sent,
         }

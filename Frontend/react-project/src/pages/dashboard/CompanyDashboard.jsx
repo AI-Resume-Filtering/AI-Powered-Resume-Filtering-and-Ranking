@@ -7,6 +7,7 @@ import Delete from "./Delete";
 import Home from "./Home";
 import PostJob from "./PostJob";
 import EmailTemplate from "./EmailTemplate";
+import ScoreThreshold from "./ScoreThreshold";
 
 // ✅ Import dashboard CSS
 import "../../styles/dashboard.css";
@@ -37,6 +38,7 @@ function CompanyDashboard() {
         {active === "delete" && <Delete company={company} />}
         {active === "history" && <History company={company} />}
         {active === "emailtemplate" && <EmailTemplate company={company} />}
+        {active === "scorethreshold" && <ScoreThreshold company={company} />}
       </div>
     </div>
   );

@@ -44,40 +44,41 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="forgot-container">
+    <div className="forgot-page">
+      <div className="forgot-container">
 
-      <div className="forgot-left">
-        <div className="logo-box">🔒</div>
-        <h1>Reset Password</h1>
-        <p>Enter your registered email to receive a secure password reset link.</p>
-      </div>
+        <div className="forgot-left">
+          <div className="logo-box">🔒</div>
+          <h1>Reset Password</h1>
+          <p>Enter your registered email to receive a secure password reset link.</p>
+        </div>
 
-      <div className="forgot-right">
-        <div className="forgot-card">
-          <h2>Forgot Password</h2>
+        <div className="forgot-right">
+          <div className="forgot-card">
+            <h2>Forgot Password</h2>
 
-          <label className={focused ? "focused" : ""}>Email</label>
-          <input
-            type="email"
-            placeholder="Enter registered email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-          />
+            <label className={focused ? "focused" : ""}>Email</label>
+            <input
+              type="email"
+              placeholder="Enter registered email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+            />
 
-          <button onClick={handleSubmit} className="primary" disabled={loading}>
-            {loading ? "Sending..." : "Send Reset Link"}
-          </button>
+            <button onClick={handleSubmit} className="primary" disabled={loading}>
+              {loading ? "Sending..." : "Send Reset Link"}
+            </button>
 
-          {message && <p className={`forgot-msg ${isError ? "error" : "success"}`}>{message}</p>}
+            {message && <p className={`forgot-msg ${isError ? "error" : "success"}`}>{message}</p>}
 
-          <div className="links">
-            <Link to="/company-login">Back to Login</Link>
+            <div className="links">
+              <Link to="/company-login">Back to Login</Link>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

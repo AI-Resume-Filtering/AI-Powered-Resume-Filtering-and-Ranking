@@ -60,7 +60,7 @@ def process_ranking():
                 if not resume_data.get("scoring_ready", False):
                     continue
 
-                score = score_resume(resume_data, metadata)
+                score, score_details = score_resume(resume_data, metadata, return_details=True)
                 job_match = resume_data.get("job_match", {})
 
                 scored_results.append({
@@ -69,6 +69,7 @@ def process_ranking():
                     "candidate_name": _resolve_candidate_name(resume_data),
                     "filename": resume_data.get("resume_filename", "Unknown"),
                     "total_score": score,
+                    "score_source": score_details.get("score_source", "blended"),
                     # Tiebreaker fields — reflect real candidate quality differences
                     "_matched_required": len(job_match.get("matched_required_skills", [])),
                     "_experience_years": resume_data.get("experience_years", 0),

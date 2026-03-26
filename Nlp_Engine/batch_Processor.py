@@ -7,7 +7,7 @@ import os
 import json
 from datetime import datetime
 from pathlib import Path
-from tqdm import tqdm
+
 
 from .config import (
     INPUT_FOLDER,
@@ -79,7 +79,7 @@ class NLPBatchProcessor:
 
         print(f"✅ Job Title: {self.job_requirements['job_title']}")
         print(f"✅ Required Skills: {len(self.job_requirements['required_skills'])}")
-        print(f"✅ Preferred Skills: {len(self.job_requirements['preferred_skills'])}")
+
         print(f"✅ Min Experience: {self.job_requirements['minimum_experience']} years")
         print(f"✅ Education: {self.job_requirements['required_education']}")
 
@@ -94,45 +94,41 @@ class NLPBatchProcessor:
             print(f"❌ No resume files found in: {self.input_folder}")
             return None
 
+
         print(f"📊 Found {len(resume_files)} resume files")
-        print(f"🔄 Starting processing...\n")
+        # (Removed erroneous indented for loop)
 
-        # Process each resume with progress tracking
-        results = {}
 
-        with tqdm(total=len(resume_files), desc="Processing Resumes", ncols=100) as pbar:
-            for idx, file_path in enumerate(resume_files, 1):
-                resume_id = f"{RESUME_ID_PREFIX}{str(idx).zfill(ID_PADDING)}"
-                filename = os.path.basename(file_path)
+        for idx, file_path in enumerate(resume_files, 1):
+            resume_id = f"{RESUME_ID_PREFIX}{str(idx).zfill(ID_PADDING)}"
+            filename = os.path.basename(file_path)
 
-                try:
-                    # Process single resume
-                    resume_data = self._process_single_resume(file_path, resume_id, filename)
-                    results[resume_id] = resume_data
-                    self.stats["success"] += 1
+            try:
+                # Process single resume
+                resume_data = self._process_single_resume(file_path, resume_id, filename)
+                results[resume_id] = resume_data
+                self.stats["success"] += 1
 
-                    # Count qualified candidates
-                    if resume_data.get("job_match", {}).get("meets_requirements"):
-                        self.stats["qualified"] += 1
+                # Count qualified candidates
+                if resume_data.get("job_match", {}).get("meets_requirements"):
+                    self.stats["qualified"] += 1
 
-                except Exception as e:
-                    # Handle error
-                    error_msg = str(e)
-                    results[resume_id] = format_error_resume(resume_id, filename, error_msg)
-                    self.stats["failed"] += 1
-                    self.stats["errors"].append({
-                        "resume_id": resume_id,
-                        "filename": filename,
-                        "error": error_msg
-                    })
+            except Exception as e:
+                # Handle error
+                error_msg = str(e)
+                results[resume_id] = format_error_resume(resume_id, filename, error_msg)
+                self.stats["failed"] += 1
+                self.stats["errors"].append({
+                    "resume_id": resume_id,
+                    "filename": filename,
+                    "error": error_msg
+                })
 
-                    if not CONTINUE_ON_ERROR:
-                        pbar.close()
-                        raise
+                if not CONTINUE_ON_ERROR:
+                    raise
 
-                finally:
-                    self.stats["total"] += 1
-                    pbar.update(1)
+            finally:
+                self.stats["total"] += 1
 
         # Sort by match score
         ranked_results = self._rank_resumes(results)

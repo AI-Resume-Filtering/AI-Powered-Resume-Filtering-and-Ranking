@@ -1,15 +1,45 @@
-Flask>=2.3.0
-Werkzeug>=2.3.0
-flask-cors>=4.0.0
-pymongo>=4.3.0
-python-dotenv>=1.0.0
-PyJWT>=2.8.0
+# ======================================
+# AI Resume Filtering - Central Python Requirements
+# Install once to run Backend + Resume Parser + NLP + AI Scoring.
+# Command: pip install -r requirements.txt
+# ======================================
 
-pdfplumber>=0.10.0
-Pillow>=10.0.0
-pytesseract>=0.3.10
-PyMuPDF>=1.24.0
-opencv-python>=4.10.0
-numpy>=1.26.0
+# --------------------------
+# Backend API and auth
+# --------------------------
+Flask>=2.3.0                 # REST API framework
+Werkzeug>=2.3.0              # Flask HTTP/request utilities
+flask-cors>=4.0.0            # Cross-origin support for frontend
+python-dotenv>=1.0.0         # Load environment variables from .env
+PyJWT>=2.8.0                 # JWT token generation/verification
 
-tqdm==4.66.1
+# --------------------------
+# Data and persistence
+# --------------------------
+pymongo>=4.3.0               # MongoDB database client
+numpy>=1.26.0                # Numeric operations for AI/ML features
+
+# --------------------------
+# Resume parsing (PDF + OCR)
+# --------------------------
+pdfplumber>=0.10.0           # PDF text and table extraction
+PyMuPDF>=1.24.0              # PDF rendering and fallback extraction
+Pillow>=10.0.0               # Image processing support for OCR pipeline
+pytesseract>=0.3.10          # OCR wrapper for scanned/image resumes
+opencv-python>=4.10.0        # Image preprocessing before OCR
+
+# --------------------------
+# NLP and semantic matching
+# --------------------------
+sentence-transformers>=3.0.0 # Semantic similarity between JD and resume
+
+# --------------------------
+# Self-learning model training
+# --------------------------
+scikit-learn>=1.4.0          # RandomForest and ML utilities
+joblib>=1.3.0                # Save/load trained model bundles
+
+# --------------------------
+# Utilities
+# --------------------------
+

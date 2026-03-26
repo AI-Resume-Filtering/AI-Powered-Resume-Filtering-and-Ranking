@@ -9,7 +9,7 @@ function CompanyRegister() {
     companyName: "",
     regNo: "",
     email: "",
-    password: ""
+    password: "",
   });
 
   const [error, setError] = useState("");
@@ -18,7 +18,7 @@ function CompanyRegister() {
     companyName: false,
     regNo: false,
     email: false,
-    password: false
+    password: false,
   });
 
   const handleChange = (e) => {
@@ -53,7 +53,7 @@ function CompanyRegister() {
         companyName: form.companyName,
         registrationNo: form.regNo,
         email: form.email,
-        password: form.password
+        password: form.password,
       });
 
       if (data.success) {
@@ -66,7 +66,6 @@ function CompanyRegister() {
       } else {
         setError(data.message || "Company already exists or server error");
       }
-
     } catch (err) {
       console.error(err);
       setError("Server error. Please try again.");
@@ -74,74 +73,74 @@ function CompanyRegister() {
   };
 
   return (
-    <div className="register-container">
+    <div className="register-page">
+      <div className="register-container">
+        <div className="register-left">
+          <div className="logo-box">🏢</div>
+          <h1>Join Our Platform</h1>
+          <p>Securely register your company and start posting jobs today!</p>
+        </div>
 
-      <div className="register-left">
-        <div className="logo-box">🏢</div>
-        <h1>Join Our Platform</h1>
-        <p>Securely register your company and start posting jobs today!</p>
-      </div>
+        <div className="register-right">
+          <div className="register-card">
+            <h2>Company Registration</h2>
 
-      <div className="register-right">
-        <div className="register-card">
-          <h2>Company Registration</h2>
+            <form onSubmit={handleSubmit}>
+              <label className={focused.companyName ? "focused" : ""}>Company Name</label>
+              <input
+                id="companyName"
+                value={form.companyName}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                required
+              />
 
-          <form onSubmit={handleSubmit}>
-            <label className={focused.companyName ? "focused" : ""}>Company Name</label>
-            <input
-              id="companyName"
-              value={form.companyName}
-              onChange={handleChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              required
-            />
+              <label className={focused.regNo ? "focused" : ""}>Company Registration No</label>
+              <input
+                id="regNo"
+                value={form.regNo}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                required
+              />
 
-            <label className={focused.regNo ? "focused" : ""}>Company Registration No</label>
-            <input
-              id="regNo"
-              value={form.regNo}
-              onChange={handleChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              required
-            />
+              <label className={focused.email ? "focused" : ""}>Company Email</label>
+              <input
+                id="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                required
+              />
 
-            <label className={focused.email ? "focused" : ""}>Company Email</label>
-            <input
-              id="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              required
-            />
+              <label className={focused.password ? "focused" : ""}>Password</label>
+              <input
+                id="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                required
+              />
 
-            <label className={focused.password ? "focused" : ""}>Password</label>
-            <input
-              id="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              required
-            />
+              <button type="submit" className="primary">Register</button>
+            </form>
 
-            <button type="submit" className="primary">Register</button>
-          </form>
+            {error && <div className="msg error">{error}</div>}
+            {success && <div className="msg success">{success}</div>}
 
-          {error && <div className="msg error">{error}</div>}
-          {success && <div className="msg success">{success}</div>}
-
-          <div className="login-link">
-            Already Registered?
-            <a href="/company-login"> Login</a>
+            <div className="login-link">
+              Already Registered?
+              <a href="/company-login"> Login</a>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

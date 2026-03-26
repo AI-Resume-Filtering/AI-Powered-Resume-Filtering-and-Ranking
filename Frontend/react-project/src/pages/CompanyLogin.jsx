@@ -48,52 +48,53 @@ function CompanyLogin() {
   };  
 
   return (
-    <div className="main-container">
+    <div className="login-page">
+      <div className="main-container">
 
-      {/* LEFT PANEL */}
-      <div className="left-panel">
-        <div className="logo-box">🛡</div>
-        <h1>Secure Enterprise <br/> Access Control</h1>
-        <p>Next-generation authentication system for modern company HR portals.</p>
-      </div>
+        {/* LEFT PANEL */}
+        <div className="left-panel">
+          <div className="login-logo-box">🛡</div>
+          <h1>Secure Enterprise <br/> Access Control</h1>
+          <p>Next-generation authentication system for modern company HR portals.</p>
+        </div>
 
-      {/* RIGHT PANEL */}
-      <div className="right-panel">
-        <div className="login-card">
-          <h2>Welcome Back</h2>
-          <p className="subtitle">Please enter your employee credentials</p>
+        {/* RIGHT PANEL */}
+        <div className="right-panel">
+          <div className="login-card">
+            <h2>Welcome Back</h2>
+            <p className="subtitle">Please enter your employee credentials</p>
 
-          <label>Email</label>
-          <input
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
 
-          <label>Password</label>
-          <input
-            type="password"
-            placeholder="Enter password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
 
-          <button
-            onClick={handleLogin}
-            className="secure-btn"
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Secure Login"}
-          </button>
+            <button
+              onClick={handleLogin}
+              className="secure-btn"
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Secure Login"}
+            </button>
 
-          <div className="links">
-            <Link to="/forgot-password">Forgot Password?</Link>
-            <Link to="/company-register">Sign Up</Link>
+            <div className="login-links">
+              <Link to="/forgot-password">Forgot Password?</Link>
+              <Link to="/company-register">Sign Up</Link>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

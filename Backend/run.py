@@ -113,6 +113,15 @@ def _ensure_local_mongo_started() -> None:
     print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
 
 
+# Eagerly warm up SBERT model at backend startup
+try:
+    from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
+    _get_model()
+    print("[startup] SBERT model loaded and cached.")
+except Exception as e:
+    print(f"[startup] SBERT model warmup failed: {e}")
+
+
 from app import create_app
 
 load_dotenv()

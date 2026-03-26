@@ -25,6 +25,7 @@ function ApplyJob() {
     body: "Complete the form below and upload your resume to continue.",
     tone: "info",
   });
+  const [hasResumeError, setHasResumeError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const pollRef = useRef(null);
@@ -43,12 +44,17 @@ function ApplyJob() {
       );
   }, [jobId]);
 
+  const handleResumeChange = () => {
+    setHasResumeError(false);
+  };
+
     const handleSubmit = async (e) => {
       e.preventDefault();
       if (isSubmitting || isProcessing) return;
 
       const resumeFile = e.target.aj_resume.files[0];
       if (resumeFile && resumeFile.size > 5 * 1024 * 1024) {
+        setHasResumeError(true);
         updateFormMessage(
           "Resume file is too large",
           "Please upload a resume that is 5 MB or smaller.",
@@ -58,6 +64,7 @@ function ApplyJob() {
         return;
       }
 
+      setHasResumeError(false);
       setIsSubmitting(true);
 
       const formData = new FormData();
@@ -78,7 +85,26 @@ function ApplyJob() {
 
         const data = await response.json();
 
+        if (!response.ok) {
+          const message =
+            data?.message ||
+            "Application could not be submitted. Please check your details and try again.";
+          const invalidResume = /does not appear to be a resume|proper resume pdf|resume/i.test(
+            message
+          );
+
+          setHasResumeError(invalidResume);
+
+          updateFormMessage(
+            invalidResume ? "Invalid document" : "Application could not be submitted",
+            message,
+            "error"
+          );
+          return;
+        }
+
         if (response.status === 202 && data.applicationId) {
+          setHasResumeError(false);
           setIsSubmitting(false);
           setIsProcessing(true);
           updateFormMessage(
@@ -212,10 +238,11 @@ function ApplyJob() {
 
           <label className="aj-label">Upload Resume</label>
           <input
-            className="aj-file-input"
+            className={`aj-file-input${hasResumeError ? " aj-file-input-error" : ""}`}
             type="file"
             name="aj_resume"
             accept=".pdf,.doc,.docx"
+            onChange={handleResumeChange}
             required
           />
 
