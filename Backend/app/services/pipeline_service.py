@@ -5,7 +5,11 @@ import sys
 from pathlib import Path
 
 # Import AI modules from project root
+<<<<<<< HEAD
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+=======
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 

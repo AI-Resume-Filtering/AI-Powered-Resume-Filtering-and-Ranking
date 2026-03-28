@@ -1,8 +1,21 @@
 import os
 
 # Guard against OpenBLAS initialization failures across all startup paths.
+<<<<<<< HEAD
 for env_var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(env_var, "1")
+=======
+# Also disable HuggingFace fast-tokenizer parallelism to avoid unnecessary
+# worker threads (and their ~8 MB stacks) being allocated on startup.
+for env_var in (
+    "OPENBLAS_NUM_THREADS",
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "TOKENIZERS_PARALLELISM",
+):
+    os.environ.setdefault(env_var, "false" if env_var == "TOKENIZERS_PARALLELISM" else "1")
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS

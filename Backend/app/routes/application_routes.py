@@ -1,8 +1,18 @@
+<<<<<<< HEAD
 import os
 import re
 import threading
 import logging
 import uuid
+=======
+import gc
+import os
+import re
+import logging
+import uuid
+import atexit
+from concurrent.futures import ThreadPoolExecutor
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
 from datetime import datetime
 from flask import Blueprint, current_app, jsonify, request, send_file
 
@@ -20,6 +30,15 @@ from Ai_Scoring.Ai_Scoring.model_trainer import maybe_retrain_model
 application_bp = Blueprint("application", __name__)
 logger = logging.getLogger(__name__)
 
+<<<<<<< HEAD
+=======
+# Bounded thread pool for background resume-processing pipelines.
+# Limiting concurrency to 2 workers caps peak memory from simultaneous
+# PDF parsing + SBERT inference on a 512 MB host.
+_pipeline_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="pipeline")
+atexit.register(_pipeline_executor.shutdown, wait=False)
+
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
 
 def _display_resume_name(filename):
     """Strip generated UUID prefixes so admins see the original upload name."""
@@ -46,7 +65,11 @@ def _assign_ranks(items):
 
 
 def _run_pipeline_in_background(flask_app, db, pipeline, job, candidate, resume_pdf_path, application_id):
+<<<<<<< HEAD
     """Background thread: run NLP+AI pipeline then update the DB record."""
+=======
+    """Background worker: run NLP+AI pipeline then update the DB record."""
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
     with flask_app.app_context():
         try:
             result = pipeline.run_from_path(job, candidate, resume_pdf_path)
@@ -74,6 +97,14 @@ def _run_pipeline_in_background(flask_app, db, pipeline, job, candidate, resume_
                 {"applicationId": application_id},
                 {"$set": {"status": "error"}}
             )
+<<<<<<< HEAD
+=======
+        finally:
+            # Prompt the GC to reclaim temp objects (parsed PDF text, embeddings,
+            # etc.) after the heavy pipeline work completes.  This runs in a
+            # background thread so any GC latency does not affect HTTP responses.
+            gc.collect()
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
 
 
 @application_bp.route("/apply", methods=["POST"])
@@ -198,6 +229,7 @@ def apply_for_job():
         db=current_app.mongo_db,
     )
 
+<<<<<<< HEAD
     # A3: Run heavy pipeline in a background thread
     flask_app = current_app._get_current_object()
     db = current_app.mongo_db
@@ -207,6 +239,17 @@ def apply_for_job():
         daemon=True,
     )
     thread.start()
+=======
+    # A3: Run heavy pipeline in the bounded background executor.
+    # Using a ThreadPoolExecutor (max_workers=2) prevents unbounded thread
+    # creation that could exhaust memory when many resumes are submitted at once.
+    flask_app = current_app._get_current_object()
+    db = current_app.mongo_db
+    _pipeline_executor.submit(
+        _run_pipeline_in_background,
+        flask_app, db, pipeline, job, candidate, resume_pdf_path, application_id,
+    )
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
 
     return jsonify({
         "success": True,

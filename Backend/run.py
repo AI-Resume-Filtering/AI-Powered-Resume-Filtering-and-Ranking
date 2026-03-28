@@ -9,11 +9,25 @@ from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
+<<<<<<< HEAD
 # Limit native math library thread usage before any NumPy/OpenBLAS imports.
 for env_var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(env_var, "1")
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+=======
+# Limit native math library and tokenizer thread usage before any NumPy/PyTorch imports.
+for env_var in (
+    "OPENBLAS_NUM_THREADS",
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "TOKENIZERS_PARALLELISM",
+):
+    os.environ.setdefault(env_var, "false" if env_var == "TOKENIZERS_PARALLELISM" else "1")
+
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -26,8 +40,12 @@ def _is_port_open(host: str, port: int, timeout: float = 0.6) -> bool:
         return False
 
 
+<<<<<<< HEAD
 def _parse_mongo_target(uri: str) -> tuple[str, int] | tuple[None, None]:
     # Only auto-start for direct local mongodb://host:port URIs.
+=======
+def _parse_mongo_target(uri: str):
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
     if not uri or not uri.startswith("mongodb://"):
         return None, None
 
@@ -76,7 +94,11 @@ def _ensure_local_mongo_started() -> None:
 
     mongod_exe = _find_mongod_exe()
     if not mongod_exe:
+<<<<<<< HEAD
         print("[startup] mongod executable not found. Install MongoDB or set MONGOD_PATH.")
+=======
+        print("[startup] mongod executable not found. Skipping local MongoDB startup.")
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
         return
 
     workspace_root = Path(PROJECT_ROOT).parent
@@ -110,6 +132,7 @@ def _ensure_local_mongo_started() -> None:
             return
         time.sleep(0.5)
 
+<<<<<<< HEAD
     print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
 
 
@@ -117,6 +140,21 @@ def _ensure_local_mongo_started() -> None:
 try:
     from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
     _get_model()
+=======
+    print(f"[startup] MongoDB did not start on {host}:{port}. Check logs.")
+
+
+# Warm up SBERT model
+try:
+    from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
+    _get_model()
+    try:
+        import torch
+        torch.set_num_threads(1)
+        torch.set_num_interop_threads(1)
+    except Exception:
+        pass
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
     print("[startup] SBERT model loaded and cached.")
 except Exception as e:
     print(f"[startup] SBERT model warmup failed: {e}")
@@ -130,6 +168,18 @@ app = create_app() if __name__ != "__main__" else None
 
 if __name__ == "__main__":
     _ensure_local_mongo_started()
+<<<<<<< HEAD
     app = create_app()
     flask_debug = os.getenv("FLASK_DEBUG", "0") == "1"
     app.run(host="0.0.0.0", port=5000, debug=flask_debug)
+=======
+
+    app = create_app()
+    flask_debug = os.getenv("FLASK_DEBUG", "0") == "1"
+
+    port = int(os.environ.get("PORT", 10000))
+
+    print(f"[startup] Starting server on port {port}")
+
+    app.run(host="0.0.0.0", port=port, debug=flask_debug)
+>>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
