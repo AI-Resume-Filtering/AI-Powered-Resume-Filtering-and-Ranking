@@ -17,6 +17,7 @@ PyJWT>=2.8.0                 # JWT token generation/verification
 # Data and persistence
 # --------------------------
 pymongo>=4.3.0               # MongoDB database client
+dnspython>=2.3.0             # Required for mongodb+srv:// Atlas connections
 numpy>=1.26.0                # Numeric operations for AI/ML features
 
 # --------------------------
