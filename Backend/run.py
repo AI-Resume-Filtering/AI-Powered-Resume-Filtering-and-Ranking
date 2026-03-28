@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 for env_var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(env_var, "1")
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
