@@ -5,11 +5,7 @@ import sys
 from pathlib import Path
 
 # Import AI modules from project root
-<<<<<<< HEAD
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
-=======
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
->>>>>>> 6b2582cb0fb6189a0f8327284cf4d76c3fdcbca1
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -69,7 +65,8 @@ class PipelineService:
         output_path = nlp_response.get("output_path", "")
 
         # L8: Use pathlib for cross-platform path assembly (handles / and \ equally)
-        output_file = (Path(self.project_root) / output_path).resolve()
+        # NLP output is relative to Backend directory, so join with Backend path
+        output_file = (Path(self.project_root) / "Backend" / output_path).resolve()
         logger.info("NLP output file: %s (exists: %s)", output_file, output_file.exists())
 
         if not output_file.exists():
