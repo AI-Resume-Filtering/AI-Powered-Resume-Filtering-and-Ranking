@@ -10,14 +10,12 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # Limit native math library and tokenizer thread usage before any NumPy/PyTorch imports.
-# Keeping these at 1 thread prevents large per-thread stack allocations and
-# reduces steady-state RSS to stay comfortably within the 512 MB target.
 for env_var in (
     "OPENBLAS_NUM_THREADS",
     "OMP_NUM_THREADS",
     "MKL_NUM_THREADS",
     "NUMEXPR_NUM_THREADS",
-    "TOKENIZERS_PARALLELISM",  # prevents HuggingFace fast-tokenizer from spawning workers
+    "TOKENIZERS_PARALLELISM",
 ):
     os.environ.setdefault(env_var, "false" if env_var == "TOKENIZERS_PARALLELISM" else "1")
 
@@ -34,8 +32,7 @@ def _is_port_open(host: str, port: int, timeout: float = 0.6) -> bool:
         return False
 
 
-def _parse_mongo_target(uri: str) -> tuple[str, int] | tuple[None, None]:
-    # Only auto-start for direct local mongodb://host:port URIs.
+def _parse_mongo_target(uri: str):
     if not uri or not uri.startswith("mongodb://"):
         return None, None
 
@@ -84,7 +81,7 @@ def _ensure_local_mongo_started() -> None:
 
     mongod_exe = _find_mongod_exe()
     if not mongod_exe:
-        print("[startup] mongod executable not found. Install MongoDB or set MONGOD_PATH.")
+        print("[startup] mongod executable not found. Skipping local MongoDB startup.")
         return
 
     workspace_root = Path(PROJECT_ROOT).parent
@@ -118,15 +115,13 @@ def _ensure_local_mongo_started() -> None:
             return
         time.sleep(0.5)
 
-    print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
+    print(f"[startup] MongoDB did not start on {host}:{port}. Check logs.")
 
 
-# Eagerly warm up SBERT model at backend startup
+# Warm up SBERT model
 try:
     from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
     _get_model()
-    # Cap PyTorch intra-op and inter-op thread pools to 1 so the model
-    # doesn't allocate large OpenMP/MKL thread stacks (~8 MB each).
     try:
         import torch
         torch.set_num_threads(1)
@@ -146,6 +141,12 @@ app = create_app() if __name__ != "__main__" else None
 
 if __name__ == "__main__":
     _ensure_local_mongo_started()
+
     app = create_app()
     flask_debug = os.getenv("FLASK_DEBUG", "0") == "1"
-    app.run(host="0.0.0.0", port=5000, debug=flask_debug)
+
+    port = int(os.environ.get("PORT", 10000))
+
+    print(f"[startup] Starting server on port {port}")
+
+    app.run(host="0.0.0.0", port=port, debug=flask_debug)
