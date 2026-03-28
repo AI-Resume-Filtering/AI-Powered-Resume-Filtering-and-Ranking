@@ -33,6 +33,7 @@ def _is_port_open(host: str, port: int, timeout: float = 0.6) -> bool:
 
 
 def _parse_mongo_target(uri: str):
+    # Only auto-start for direct local mongodb://host:port URIs.
     if not uri or not uri.startswith("mongodb://"):
         return None, None
 
@@ -44,7 +45,7 @@ def _parse_mongo_target(uri: str):
     return host, port
 
 
-def _find_mongod_exe() -> str | None:
+def _find_mongod_exe():
     env_path = os.getenv("MONGOD_PATH", "").strip()
     if env_path and os.path.exists(env_path):
         return env_path
@@ -61,7 +62,7 @@ def _find_mongod_exe() -> str | None:
     return which("mongod")
 
 
-def _ensure_local_mongo_started() -> None:
+def _ensure_local_mongo_started():
     auto_start = os.getenv("AUTO_START_MONGO", "true").strip().lower() in {"1", "true", "yes", "on"}
     if not auto_start:
         return
@@ -81,7 +82,7 @@ def _ensure_local_mongo_started() -> None:
 
     mongod_exe = _find_mongod_exe()
     if not mongod_exe:
-        print("[startup] mongod executable not found. Skipping local MongoDB startup.")
+        print("[startup] mongod executable not found. Install MongoDB or set MONGOD_PATH.")
         return
 
     workspace_root = Path(PROJECT_ROOT).parent
@@ -115,10 +116,10 @@ def _ensure_local_mongo_started() -> None:
             return
         time.sleep(0.5)
 
-    print(f"[startup] MongoDB did not start on {host}:{port}. Check logs.")
+    print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
 
 
-# Warm up SBERT model
+# Eagerly warm up SBERT model at backend startup
 try:
     from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
     _get_model()
@@ -145,7 +146,7 @@ if __name__ == "__main__":
     app = create_app()
     flask_debug = os.getenv("FLASK_DEBUG", "0") == "1"
 
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))
 
     print(f"[startup] Starting server on port {port}")
 

@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 _pipeline_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="pipeline")
 atexit.register(_pipeline_executor.shutdown, wait=False)
 
-
 def _display_resume_name(filename):
     """Strip generated UUID prefixes so admins see the original upload name."""
     base_name = os.path.basename(filename or "")
