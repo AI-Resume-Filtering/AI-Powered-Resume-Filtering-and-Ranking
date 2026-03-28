@@ -27,12 +27,14 @@ pdfplumber>=0.10.0           # PDF text and table extraction
 PyMuPDF>=1.24.0              # PDF rendering and fallback extraction
 Pillow>=10.0.0               # Image processing support for OCR pipeline
 pytesseract>=0.3.10          # OCR wrapper for scanned/image resumes
-opencv-python>=4.10.0        # Image preprocessing before OCR
+opencv-python-headless>=4.10.0  # Image preprocessing before OCR (headless = no Qt/GUI, ~80 MB smaller)
 
 # --------------------------
 # NLP and semantic matching
 # --------------------------
-sentence-transformers>=3.0.0 # Semantic similarity between JD and resume
+# sentence-transformers is NOT required on Render (external API is used instead).
+# Install locally for offline development: pip install sentence-transformers
+# sentence-transformers>=3.0.0
 
 # --------------------------
 # Self-learning model training

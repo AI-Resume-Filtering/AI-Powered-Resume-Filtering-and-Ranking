@@ -121,23 +121,6 @@ def _ensure_local_mongo_started() -> None:
     print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
 
 
-# Eagerly warm up SBERT model at backend startup
-try:
-    from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
-    _get_model()
-    # Cap PyTorch intra-op and inter-op thread pools to 1 so the model
-    # doesn't allocate large OpenMP/MKL thread stacks (~8 MB each).
-    try:
-        import torch
-        torch.set_num_threads(1)
-        torch.set_num_interop_threads(1)
-    except Exception:
-        pass
-    print("[startup] SBERT model loaded and cached.")
-except Exception as e:
-    print(f"[startup] SBERT model warmup failed: {e}")
-
-
 from app import create_app
 
 load_dotenv()
