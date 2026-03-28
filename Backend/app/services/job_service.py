@@ -33,9 +33,11 @@ class JobService:
         pdf_path = self.storage.save_upload(jd_file, "job_descriptions")
         description_text = self._resume_parser.parse(pdf_path)
 
-        # --- Semantic Job Description Deduplication ---
+        company_id = company.get("companyId")
+
+        # --- Semantic Job Description Deduplication (scoped to company) ---
         dedup = JobDescriptionDeduplicator(self.collection)
-        similar_job_id, similarity = dedup.find_similar(description_text)
+        similar_job_id, similarity = dedup.find_similar(description_text, company_id=company_id)
         if similar_job_id:
             existing_job = self.collection.find_one({"jobId": similar_job_id})
             if existing_job:
@@ -43,7 +45,7 @@ class JobService:
 
         # Fallback: hash-based deduplication for exact matches (legacy)
         jd_hash = hashlib.sha256(description_text.strip().encode("utf-8")).hexdigest()
-        existing_job = self.collection.find_one({"jd_hash": jd_hash, "companyId": company.get("companyId")})
+        existing_job = self.collection.find_one({"jd_hash": jd_hash, "companyId": company_id})
         if existing_job:
             return existing_job
 
@@ -53,7 +55,7 @@ class JobService:
             "title": job_title,
             "description": description_text,
             "descriptionPdfPath": pdf_path,
-            "companyId": company.get("companyId"),
+            "companyId": company_id,
             "companyName": company.get("name"),
             "companyRegNo": company.get("registrationNo"),
             "companyEmail": company.get("email"),

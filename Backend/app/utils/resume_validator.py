@@ -2,7 +2,6 @@
 
 Validation checks:
 1) PDF contains enough extractable text.
-2) Core resume signals are present.
 
 This module now uses layered extraction:
 - pdfplumber text extraction
@@ -28,30 +27,8 @@ logger = logging.getLogger(__name__)
 
 # -- Tuneable thresholds -----------------------------------------------------
 
-MIN_TEXT_LENGTH = 120  # characters — reject blank / near-empty PDFs
-MIN_SECTION_SIGNALS = 2  # at least N of: education/experience/skills/projects
+MIN_TEXT_LENGTH = 40  # keep permissive: accept low-content docs, reject only near-empty PDFs
 MAX_OCR_PAGES = 2  # OCR first N pages only (fast + enough for resume headers)
-
-_EMAIL_RE = re.compile(r"\b[^\s@]+@[^\s@]+\.[^\s@]+\b")
-_PHONE_RE = re.compile(r"(?:\+?\d[\d\s().-]{7,}\d)")
-
-_REQUIRED_SIGNAL_KEYWORDS = {
-    "education": [
-        "education", "degree", "university", "college", "b.tech", "b.e.",
-        "bachelor", "master", "m.tech", "diploma", "school",
-    ],
-    "experience": [
-        "experience", "work history", "employment", "internship", "intern", "worked at",
-    ],
-    "skills": [
-        "skills", "technologies", "tech stack", "tools", "languages", "frameworks",
-    ],
-    "projects": [
-        "project", "projects", "achievement", "certification", "certificate",
-        "award", "publication", "research",
-    ],
-}
-
 
 def _extract_text(pdf_path: str) -> str:
     """Extract raw text from PDF without running OCR (fast path)."""
@@ -148,48 +125,7 @@ def validate_resume_content(pdf_path: str) -> tuple:
             "Please upload a proper resume PDF.",
         )
 
-    # -- Check 2: require BOTH email and phone -----------------------------
-    has_email = bool(_EMAIL_RE.search(text))
-    has_phone = bool(_PHONE_RE.search(text))
-    if not (has_email and has_phone):
-        return (
-            False,
-            "The uploaded document must contain BOTH an email address and a phone number. "
-            "Please upload a resume with full contact details.",
-        )
-
-    # -- Check 3: require at least 3/4 core sections -----------------------
-    missing_signals = []
-    matched_sections = 0
-    for signal_name, keywords in _REQUIRED_SIGNAL_KEYWORDS.items():
-        if not any(kw in lowered for kw in keywords):
-            missing_signals.append(signal_name)
-        else:
-            matched_sections += 1
-    if matched_sections < 3:
-        pretty_missing = ", ".join(missing_signals)
-        return (
-            False,
-            f"The uploaded document does not appear to be a resume. "
-            f"Missing required resume sections: {pretty_missing}. "
-            "Please upload a valid resume with clear sections like education, experience, skills, or projects.",
-        )
-
-    # (Removed) Check for resume-specific keywords on first page
-
-    # -- Optional: Require a likely name at the top ------------------------
-    # Heuristic: first 5 lines, at least 2 words, mostly alphabetic
-    lines = [line.strip() for line in text.splitlines() if line.strip()][:5]
-    name_found = False
-    for line in lines:
-        if 2 <= len(line.split()) <= 5 and sum(c.isalpha() for c in line) / max(1, len(line)) > 0.7:
-            name_found = True
-            break
-    if not name_found:
-        return (
-            False,
-            "The uploaded document does not appear to have a candidate name at the top. "
-            "Please upload a resume with your name clearly listed at the top.",
-        )
+    # Keep validation permissive by design: content quality is handled in scoring.
+    # This allows placeholder text (including lorem ipsum) to be accepted but scored very low.
 
     return (True, None)

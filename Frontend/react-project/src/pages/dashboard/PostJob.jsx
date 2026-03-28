@@ -2,7 +2,7 @@ import { useState } from "react";
 import API from "../../api";
 import "../../styles/PostJob.css";
 
-function PostJob({ company }) {
+function PostJob({ company, onJobPosted }) {
 
   const [jobTitle, setJobTitle] = useState("");
   const [pdfFile, setPdfFile] = useState(null);
@@ -46,6 +46,12 @@ function PostJob({ company }) {
         setMessage("Job posted successfully!");
         setJobTitle("");
         setPdfFile(null);
+        // Trigger refresh in parent component
+        if (onJobPosted) {
+          onJobPosted();
+        }
+        // Also dispatch event for Home component listener
+        window.dispatchEvent(new Event("jobPosted"));
       } 
       else {
         setMessageType("error");

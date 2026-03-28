@@ -15,12 +15,18 @@ function DeleteJob({ company }) {
 
     const fetchJobs = async () => {
       try {
-        const data = await API.getCompanyJobs(company.companyId);
-        setJobs(data || []);
-        setError("");
+        const response = await API.getCompanyJobs(company.companyId);
+        if (response.success && Array.isArray(response.data)) {
+          setJobs(response.data);
+          setError("");
+        } else {
+          setError(response.message || "Failed to load jobs");
+          setJobs([]);
+        }
       } catch (err) {
         console.error("Error fetching jobs:", err);
         setError("Failed to load jobs");
+        setJobs([]);
       }
     };
 

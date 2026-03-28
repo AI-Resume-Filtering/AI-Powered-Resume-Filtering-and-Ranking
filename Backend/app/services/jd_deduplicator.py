@@ -13,12 +13,23 @@ class JobDescriptionDeduplicator:
     def compute_embedding(self, text):
         return self.model.encode(text, convert_to_numpy=True)
 
-    def find_similar(self, new_text):
+    def find_similar(self, new_text, company_id=None):
+        """
+        Find semantically similar job descriptions.
+        If company_id is provided, only search within that company's jobs (scoped deduplication).
+        Otherwise, search globally (for backward compatibility).
+        """
         new_emb = self.compute_embedding(new_text)
         # Ensure new_emb is float32
         new_emb = np.asarray(new_emb, dtype=np.float32)
-        # Fetch all existing embeddings from DB
-        jobs = list(self.collection.find({}, {"jobId": 1, "description": 1, "embedding": 1}))
+        
+        # Build filter: scope by company if provided
+        filter_query = {}
+        if company_id:
+            filter_query["companyId"] = company_id
+        
+        # Fetch existing embeddings from DB with optional company filtering
+        jobs = list(self.collection.find(filter_query, {"jobId": 1, "description": 1, "companyId": 1, "embedding": 1}))
         for job in jobs:
             if "embedding" in job:
                 existing_emb = np.array(job["embedding"], dtype=np.float32)

@@ -102,10 +102,32 @@ class API {
 
   /** S4: Sends auth token so backend can verify ownership. */
   static async getCompanyJobs(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/jobs`, {
-      headers: { ...API._authHeader() },
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/${companyId}/jobs`, {
+        headers: { ...API._authHeader() },
+      });
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          status: response.status,
+          message: error.message || `Failed to fetch jobs (${response.status})`,
+          data: [],
+        };
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data || [], status: response.status };
+    } catch (err) {
+      console.error('Error fetching company jobs:', err);
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+        data: [],
+      };
+    }
   }
 
   static async postJob(formData) {
@@ -141,25 +163,86 @@ class API {
   }
 
   static async getCompanyResumes(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/resumes`, {
-      headers: { ...API._authHeader() },
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/${companyId}/resumes`, {
+        headers: { ...API._authHeader() },
+      });
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          status: response.status,
+          message: error.message || `Failed to fetch resumes (${response.status})`,
+          data: [],
+        };
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data || [], status: response.status };
+    } catch (err) {
+      console.error('Error fetching company resumes:', err);
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+        data: [],
+      };
+    }
   }
 
   static async getCompanyHistory(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/history`, {
-      headers: { ...API._authHeader() },
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/${companyId}/history`, {
+        headers: { ...API._authHeader() },
+      });
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          status: response.status,
+          message: error.message || `Failed to fetch history (${response.status})`,
+          data: [],
+        };
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data || [], status: response.status };
+    } catch (err) {
+      console.error('Error fetching company history:', err);
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+        data: [],
+      };
+    }
   }
 
   /** Email template: load the company's saved selection notification template. */
   static async getEmailTemplate(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/email-template`, {
-      headers: { ...API._authHeader() },
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/${companyId}/email-template`, {
+        headers: { ...API._authHeader() },
+      });
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          message: error.message || `Failed to fetch email template (${response.status})`,
+        };
+      }
+      
+      return await response.json();
+    } catch (err) {
+      console.error('Error fetching email template:', err);
+      return {
+        success: false,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
   }
 
   /** Email template: save/update the company's selection notification template. */
@@ -173,10 +256,27 @@ class API {
   }
 
   static async getCompanyScoreThreshold(companyId) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/score-threshold`, {
-      headers: { ...API._authHeader() },
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/${companyId}/score-threshold`, {
+        headers: { ...API._authHeader() },
+      });
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          message: error.message || `Failed to fetch score threshold (${response.status})`,
+        };
+      }
+      
+      return await response.json();
+    } catch (err) {
+      console.error('Error fetching score threshold:', err);
+      return {
+        success: false,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
   }
 
   static async saveCompanyScoreThreshold(companyId, scoreThreshold) {

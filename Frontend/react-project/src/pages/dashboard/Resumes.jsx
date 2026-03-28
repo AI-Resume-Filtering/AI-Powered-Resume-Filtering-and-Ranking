@@ -12,8 +12,18 @@ function Resumes({ company, setActive }) {
     if (!company) return;
 
     API.getCompanyResumes(company.companyId)
-      .then(data => setResumes(data || []))
-      .catch(err => console.error(err))
+      .then(response => {
+        if (response.success && Array.isArray(response.data)) {
+          setResumes(response.data);
+        } else {
+          console.error('Failed to load resumes:', response.message);
+          setResumes([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error loading resumes:', err);
+        setResumes([]);
+      })
       .finally(() => setLoading(false));
   }, [company]);
 

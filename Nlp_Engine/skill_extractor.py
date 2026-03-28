@@ -8,6 +8,29 @@ from difflib import SequenceMatcher
 from .skill_database import SKILL_DATABASE
 from .config import MIN_CONFIDENCE, USE_FUZZY_MATCHING, FUZZY_THRESHOLD
 
+_WORD_RE = re.compile(r"[a-zA-Z]{2,}")
+_LOREM_WORDS = {
+    "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing",
+    "elit", "sed", "eiusmod", "tempor", "incididunt", "labore", "dolore",
+    "magna", "aliqua", "enim", "minim", "veniam",
+}
+
+
+def _looks_placeholder_or_gibberish(text: str) -> bool:
+    tokens = [t.lower() for t in _WORD_RE.findall(text)]
+    if not tokens:
+        return True
+
+    lorem_hits = sum(1 for t in tokens if t in _LOREM_WORDS)
+    lorem_ratio = lorem_hits / max(len(tokens), 1)
+    unique_ratio = len(set(tokens)) / max(len(tokens), 1)
+
+    if lorem_hits >= 6 and lorem_ratio >= 0.08:
+        return True
+    if len(tokens) >= 50 and unique_ratio < 0.20:
+        return True
+    return False
+
 
 def extract_skills(text: str) -> dict:
     """
@@ -29,6 +52,15 @@ def extract_skills(text: str) -> dict:
         }
     """
     text_lower = text.lower()
+
+    # Hard gate: placeholder/gibberish text should not produce any skill matches.
+    if _looks_placeholder_or_gibberish(text_lower):
+        return {
+            "skills_list": [],
+            "skills_by_category": {},
+            "skill_details": {}
+        }
+
     found_skills = {}
 
     # Check each skill in database
@@ -65,19 +97,24 @@ def _match_skill(text: str, skill: str, synonyms: list) -> tuple:
     Returns:
         (matched: bool, confidence: float)
     """
-    # Method 1: Exact match
-    if skill.lower() in text:
+    # Method 1: Exact phrase with boundaries (avoids random substring hits)
+    skill_pattern = r"(?<!\w)" + re.escape(skill.lower()) + r"(?!\w)"
+    if re.search(skill_pattern, text):
         return True, 1.0
 
     # Method 2: Synonym match
     for synonym in synonyms:
-        if synonym.lower() in text:
+        synonym_pattern = r"(?<!\w)" + re.escape(synonym.lower()) + r"(?!\w)"
+        if re.search(synonym_pattern, text):
             return True, 0.95
 
     # Method 3: Fuzzy match (if enabled)
     if USE_FUZZY_MATCHING:
-        words = re.findall(r'\b\w+\b', text)
+        words = re.findall(r'\b[\w\+#\.\-/]+\b', text)
         for word in words:
+            # Avoid fuzzy-matching tiny tokens such as "c" or "r".
+            if len(skill) < 4 or len(word) < 4:
+                continue
             similarity = SequenceMatcher(None, skill.lower(), word).ratio()
             if similarity >= FUZZY_THRESHOLD:
                 return True, round(similarity, 2)

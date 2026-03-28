@@ -164,10 +164,14 @@ def _extract_jd_skills(text: str, sections: dict) -> dict:
         required_skills = required_skills_data["skills_list"]
         preferred_skills = preferred_skills_data["skills_list"]
     else:
-        # No clear separation - treat first 70% as required, rest as preferred
-        split_point = int(len(all_skills) * 0.7)
-        required_skills = all_skills[:split_point]
-        preferred_skills = all_skills[split_point:]
+        # No explicit required/preferred blocks found.
+        # Treat extracted skills as required only, to avoid arbitrary 70/30 split noise.
+        required_skills = all_skills
+        preferred_skills = []
+
+    # De-duplicate while preserving order
+    required_skills = list(dict.fromkeys(required_skills))
+    preferred_skills = [s for s in dict.fromkeys(preferred_skills) if s not in set(required_skills)]
 
     return {
         "required": required_skills,

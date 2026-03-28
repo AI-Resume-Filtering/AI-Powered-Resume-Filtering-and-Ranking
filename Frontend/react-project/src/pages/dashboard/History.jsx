@@ -14,10 +14,16 @@ function CompanyHistory({ company }) {
 
     const fetchData = async () => {
       try {
-        const data = await API.getCompanyHistory(company.companyId);
-        setHistory(data || []);
+        const response = await API.getCompanyHistory(company.companyId);
+        if (response.success && Array.isArray(response.data)) {
+          setHistory(response.data);
+        } else {
+          console.error('Failed to load history:', response.message);
+          setHistory([]);
+        }
       } catch (err) {
-        console.error(err);
+        console.error('Error loading history:', err);
+        setHistory([]);
       } finally {
         setLoading(false);
       }

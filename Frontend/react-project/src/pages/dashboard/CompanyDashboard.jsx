@@ -14,6 +14,7 @@ import "../../styles/dashboard.css";
 
 function CompanyDashboard() {
   const [active, setActive] = useState("home");
+  const [jobsRefreshTick, setJobsRefreshTick] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,9 +33,16 @@ function CompanyDashboard() {
 
       {/* Main Content */}
       <div className="main-content">
-        {active === "home" && <Home company={company} />}
+        {active === "home" && <Home company={company} refreshTick={jobsRefreshTick} />}
         {active === "resumes" && <Resumes company={company} setActive={setActive} />}
-        {active === "postjob" && <PostJob company={company} />}
+        {active === "postjob" && (
+          <PostJob
+            company={company}
+            onJobPosted={() => {
+              setJobsRefreshTick((tick) => tick + 1);
+            }}
+          />
+        )}
         {active === "delete" && <Delete company={company} />}
         {active === "history" && <History company={company} />}
         {active === "emailtemplate" && <EmailTemplate company={company} />}

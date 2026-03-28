@@ -5,7 +5,8 @@ __pycache__/
 *.so
 .Python
 env/
-venv/
+venv/happen
+
 .venv/
 ENV/
 build/
@@ -22,14 +23,10 @@ var/
 wheels/
 *.egg-info/
 .installed.cfg
-*.egg
-
-# IDE
-.vscode/
-.idea/
-*.swp
+*.egg.swp
 *.swo
 *~
+*.pyc
 
 ## Output files (keep folder structure, ignore generated files)
 Nlp_Engine/output/*.json

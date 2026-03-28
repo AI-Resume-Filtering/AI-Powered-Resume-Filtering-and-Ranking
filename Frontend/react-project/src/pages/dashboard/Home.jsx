@@ -2,19 +2,37 @@ import { useEffect, useState } from "react";
 import API from "../../api";
 import "../../styles/dashboard.css";
 
-function Home({ company }) {
+function Home({ company, refreshTick = 0 }) {
 
   const [jobs, setJobs] = useState([]);
   const totalApplications = jobs.reduce((sum, j) => sum + (j.totalApplications || 0), 0);
 
   useEffect(() => {
-    if (!company) return;
+    if (!company?.companyId) return;
 
-    API.getCompanyJobs(company.companyId)
-      .then(data => setJobs(data || []))
-      .catch(err => console.error(err));
+    const loadJobs = () => {
+      API.getCompanyJobs(company.companyId)
+        .then(response => {
+          if (response.success && Array.isArray(response.data)) {
+            setJobs(response.data);
+          } else {
+            console.error('Failed to load jobs:', response.message);
+            setJobs([]);
+          }
+        })
+        .catch(err => {
+          console.error('Error loading jobs:', err);
+          setJobs([]);
+        });
+    };
 
-  }, [company]);
+    loadJobs();
+    window.addEventListener("jobPosted", loadJobs);
+
+    return () => {
+      window.removeEventListener("jobPosted", loadJobs);
+    };
+  }, [company, refreshTick]);
 
   return (
     <div className="home-container">
