@@ -1,0 +1,225 @@
+/* Company Register CSS - modern 2-column glass theme */
+
+.register-page,
+.register-page * {
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.register-page {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0b1624, #152536);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 18px;
+}
+
+.register-container {
+    display: flex;
+    width: min(1180px, 100%);
+    min-height: 640px;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+}
+
+
+/* LEFT PANEL */
+
+.register-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(36px, 5vw, 70px) clamp(22px, 4vw, 40px);
+    color: #fff;
+}
+
+.register-left .logo-box {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    border-radius: 50%;
+    margin-bottom: 30px;
+}
+
+.register-left h1 {
+    font-size: clamp(32px, 3.6vw, 42px);
+    margin-bottom: 20px;
+}
+
+.register-left p {
+    font-size: 16px;
+    color: #cbd5e1;
+    max-width: 350px;
+}
+
+
+/* RIGHT PANEL */
+
+.register-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(24px, 4vw, 50px);
+    background: linear-gradient(180deg, #08142c, #0b1220);
+}
+
+.register-card {
+    width: 100%;
+    max-width: 440px;
+    padding: clamp(24px, 3vw, 40px);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    color: #fff;
+}
+
+.register-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+
+
+/* FORM FIELDS */
+
+.register-card label {
+    display: block;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #cbd5e1;
+    transition: 0.3s;
+}
+
+.register-card label.focused {
+    color: #38bdf8;
+}
+
+.register-card input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(30, 41, 59, 0.8);
+    color: #fff;
+    transition: 0.3s;
+}
+
+.register-card input:focus {
+    background: rgba(30, 41, 59, 1);
+    box-shadow: 0 0 8px #38bdf8;
+}
+
+
+/* BUTTON */
+
+.register-card .primary {
+    width: 100%;
+    padding: 14px;
+    margin-top: 25px;
+    border-radius: 30px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+    color: #fff;
+    transition: 0.3s;
+}
+
+.register-card .primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(56, 189, 248, 0.5);
+}
+
+
+/* ERROR & SUCCESS MESSAGES */
+
+.msg {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.msg.error {
+    color: #ff7675;
+}
+
+.msg.success {
+    color: #2ecc71;
+}
+
+
+/* LOGIN LINK */
+
+.login-link {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #7dd3fc;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .register-page {
+        padding: 12px;
+        align-items: flex-start;
+    }
+
+    .register-container {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .register-left,
+    .register-right {
+        flex: unset;
+        width: 100%;
+        padding: 40px;
+    }
+    .register-left {
+        text-align: center;
+    }
+
+    .register-left p {
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .register-page {
+        padding: 14px;
+        align-items: flex-start;
+    }
+
+    .register-container {
+        min-height: 560px;
+    }
+
+    .register-left {
+        padding: 42px 26px;
+    }
+
+    .register-right {
+        padding: 24px;
+    }
+}

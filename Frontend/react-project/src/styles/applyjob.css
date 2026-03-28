@@ -1,0 +1,273 @@
+/* ============================= */
+
+
+/* PAGE WRAPPER */
+
+
+/* ============================= */
+
+.aj-page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px;
+    background: #0f172a;
+}
+
+
+/* ============================= */
+
+
+/* CARD */
+
+
+/* ============================= */
+
+.aj-card {
+    width: 600px;
+    max-width: 95%;
+    background: #1e293b;
+    padding: 40px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid #334155;
+    color: #f8fafc;
+}
+
+
+/* ============================= */
+
+
+/* TITLE */
+
+
+/* ============================= */
+
+.aj-title {
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+
+/* ============================= */
+
+
+/* LABELS & TEXTAREA */
+
+
+/* ============================= */
+
+.aj-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.aj-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #64748b;
+    background: #0f172a;
+    color: #f8fafc;
+    resize: vertical;
+}
+
+
+/* ============================= */
+
+
+/* INPUT FIELDS */
+
+
+/* ============================= */
+
+.aj-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #64748b;
+    font-size: 14px;
+    margin-bottom: 12px;
+    background: #1e293b;
+    color: #f8fafc;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.aj-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+
+/* ============================= */
+
+
+/* FILE INPUT */
+
+
+/* ============================= */
+
+.aj-file-input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #64748b;
+    background: #1e293b;
+    color: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.aj-file-input:hover {
+    border-color: #2563eb;
+}
+
+.aj-file-input-error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+.aj-file-input-error:hover,
+.aj-file-input-error:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.24);
+}
+
+
+/* ============================= */
+
+
+/* BUTTONS */
+
+
+/* ============================= */
+
+.aj-btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.aj-btn-submit {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background: #2563eb;
+    color: #f8fafc;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.aj-btn-submit:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+.aj-btn-submit:disabled {
+    background: #64748b;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.aj-btn-back {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #64748b;
+    background: transparent;
+    color: #f8fafc;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.aj-btn-back:hover {
+    background: #334155;
+    border-color: #2563eb;
+}
+
+
+/* ============================= */
+
+
+/* MESSAGE BOX */
+
+
+/* ============================= */
+
+.aj-msg {
+    margin-top: 15px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    text-align: left;
+    border: 1px solid #334155;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.28);
+    transition: all 0.25s ease;
+}
+
+.aj-msg-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.aj-msg-body {
+    margin-top: 6px;
+    font-size: 0.96rem;
+    line-height: 1.6;
+}
+
+.aj-msg-info {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border-color: #93c5fd;
+    color: #1e3a8a;
+}
+
+.aj-msg-processing {
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    border-color: #7dd3fc;
+    color: #0c4a6e;
+}
+
+.aj-msg-success {
+    background: linear-gradient(135deg, #dff6e7, #c7ead4);
+    border-color: #9ed8b2;
+    color: #14532d;
+}
+
+.aj-msg-error {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+
+/* ============================= */
+
+
+/* RESPONSIVE */
+
+
+/* ============================= */
+
+@media (max-width: 650px) {
+    .aj-card {
+        width: 100%;
+        padding: 25px;
+    }
+}

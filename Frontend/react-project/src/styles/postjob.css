@@ -1,0 +1,189 @@
+/* ============================= */
+
+
+/* WRAPPER */
+
+
+/* ============================= */
+
+.pj-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+
+/* ============================= */
+
+
+/* CARD */
+
+
+/* ============================= */
+
+.pj-card {
+    width: 100%;
+    max-width: 420px;
+    background: #0b0b1d;
+    padding: 32px 24px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid #1e293b;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+}
+
+
+/* TITLE */
+
+.pj-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    color: #f5f5f5;
+}
+
+
+/* INPUT */
+
+.pj-input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #94a3b8;
+    font-size: 14px;
+    background: white;
+}
+
+
+/* FILE LABEL */
+
+.pj-file-label {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+
+/* UPLOAD BOX */
+
+.pj-upload-box {
+    border: 2px dashed #334155;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    background: #111132;
+    color: #cbd5e1;
+    transition: 0.25s;
+}
+
+.pj-upload-box:hover {
+    border-color: #2563eb;
+    background: #0f0f28;
+}
+
+.pj-upload-text {
+    font-size: 14px;
+}
+
+.pj-upload-subtext {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+
+/* HIDDEN INPUT */
+
+.pj-hidden-input {
+    display: none;
+}
+
+
+/* FILE NAME */
+
+.pj-file-name {
+    font-size: 13px;
+    color: #16a34a;
+}
+
+
+/* BUTTON */
+
+.pj-btn-primary {
+    padding: 13px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+
+/* STATUS MESSAGE */
+
+.pj-status-msg {
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.pj-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.pj-error {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+.pj-info {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+
+/* ============================= */
+
+
+/* INFO PANEL */
+
+
+/* ============================= */
+
+.pj-info-panel {
+    width: 700px;
+    height: 400px;
+    background: #0b0b1d;
+    padding: 22px;
+    border-radius: 12px;
+    border: 1px solid #1e293b;
+    color: #e2e8f0;
+    border-radius: 45px;
+    font-weight: 800;
+}
+
+.pj-info-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+    margin-top: 15px;
+    height: 30px;
+}
+
+.pj-info-text {
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.pj-info-list {
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    color: #cbd5e1;
+}
