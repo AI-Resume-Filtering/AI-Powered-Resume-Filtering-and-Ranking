@@ -20,8 +20,8 @@ from .extensions import init_mongo
 from .routes import register_blueprints
 from .utils.logging import configure_logging
 from .utils.email_queue import init_email_queue
-from .utils.ttl_indexes import ensure_indexes
 from .utils.secrets import init_key_vault
+from .models import setup_database
 
 
 def create_app():
@@ -57,15 +57,15 @@ def create_app():
     if app.config.get("EMAIL_QUEUE_ENABLED", True):
         init_email_queue(enabled=True)
 
-    # MongoDB TTL + query indexes
+    # Create collections, validators, and all indexes
     try:
-        ensure_indexes(
+        setup_database(
             app.mongo_db,
             audit_ttl_days=int(app.config.get("AUDIT_LOG_TTL_DAYS", 90)),
             rate_limit_ttl_days=int(app.config.get("RATE_LIMIT_TTL_DAYS", 7)),
         )
     except Exception:
-        app.logger.warning("Could not ensure database indexes at startup", exc_info=True)
+        app.logger.warning("Could not set up database at startup", exc_info=True)
 
     # Azure Key Vault (no-op when AZURE_KEY_VAULT_URL is not set or SDK not installed)
     init_key_vault(app.config.get("AZURE_KEY_VAULT_URL", ""))
