@@ -86,10 +86,10 @@ def train_model_from_feedback(db, min_samples: int = 20, model_path: str = None)
         }
 
     clf = RandomForestClassifier(
-        n_estimators=200,
+        n_estimators=100,   # 100 trees is sufficient and halves the trained model size
         random_state=42,
         class_weight="balanced",
-        n_jobs=-1,
+        n_jobs=1,           # single-threaded to avoid joblib forking extra processes
     )
     clf.fit(X, y)
 

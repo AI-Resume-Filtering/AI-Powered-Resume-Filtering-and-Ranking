@@ -17,6 +17,10 @@ def init_mongo(app):
         connectTimeoutMS=app.config.get("MONGO_CONNECT_TIMEOUT_MS", 3000),
         socketTimeoutMS=app.config.get("MONGO_SOCKET_TIMEOUT_MS", 5000),
         retryWrites=True,
+        # Keep the connection pool small so idle sockets don't consume
+        # unnecessary file-descriptor and memory overhead on a 512 MB host.
+        maxPoolSize=5,
+        minPoolSize=0,
     )
     app.mongo_db = mongo_client[app.config["MONGO_DB"]]
     _set_mongo_status(app, False, None)

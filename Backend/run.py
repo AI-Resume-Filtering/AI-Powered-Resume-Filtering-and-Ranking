@@ -9,9 +9,17 @@ from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
-# Limit native math library thread usage before any NumPy/OpenBLAS imports.
-for env_var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
-    os.environ.setdefault(env_var, "1")
+# Limit native math library and tokenizer thread usage before any NumPy/PyTorch imports.
+# Keeping these at 1 thread prevents large per-thread stack allocations and
+# reduces steady-state RSS to stay comfortably within the 512 MB target.
+for env_var in (
+    "OPENBLAS_NUM_THREADS",
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "TOKENIZERS_PARALLELISM",  # prevents HuggingFace fast-tokenizer from spawning workers
+):
+    os.environ.setdefault(env_var, "false" if env_var == "TOKENIZERS_PARALLELISM" else "1")
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 if PROJECT_ROOT not in sys.path:
@@ -117,6 +125,14 @@ def _ensure_local_mongo_started() -> None:
 try:
     from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
     _get_model()
+    # Cap PyTorch intra-op and inter-op thread pools to 1 so the model
+    # doesn't allocate large OpenMP/MKL thread stacks (~8 MB each).
+    try:
+        import torch
+        torch.set_num_threads(1)
+        torch.set_num_interop_threads(1)
+    except Exception:
+        pass
     print("[startup] SBERT model loaded and cached.")
 except Exception as e:
     print(f"[startup] SBERT model warmup failed: {e}")
