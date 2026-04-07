@@ -8,9 +8,8 @@
 
 .pj-wrapper {
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     gap: 30px;
     margin-top: 20px;
     width: 100%;
@@ -157,7 +156,8 @@
 /* ============================= */
 
 .pj-info-panel {
-    width: 400px;
+    width: 700px;
+    height: 400px;
     background: #0b0b1d;
     padding: 22px;
     border-radius: 12px;
