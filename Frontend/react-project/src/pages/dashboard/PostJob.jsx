@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import API from "../../api";
+import { useBackgroundTasks } from "../../context/BackgroundTasksContext";
 import "../../styles/PostJob.css";
 
 function PostJob({ company, onJobPosted }) {
@@ -9,6 +10,14 @@ function PostJob({ company, onJobPosted }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info");
+  const mountedRef = useRef(true);
+  const { runTask } = useBackgroundTasks();
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const handleSubmit = async () => {
 
@@ -39,13 +48,31 @@ function PostJob({ company, onJobPosted }) {
       formData.append("jobTitle", jobTitle);
       formData.append("descriptionPdf", pdfFile);
 
-      const data = await API.postJob(formData);
+      const { promise } = runTask(
+        {
+          type: "job-post",
+          title: `Posting job: ${jobTitle}`,
+          message: "Uploading and creating job post...",
+        },
+        async ({ update }) => {
+          const data = await API.postJob(formData);
+          if (!data?.success) {
+            throw new Error(data?.message || "Failed to post job");
+          }
+          update({ message: "Job posted successfully" });
+          return data;
+        }
+      );
+
+      const data = await promise;
 
       if (data.success) {
-        setMessageType("success");
-        setMessage("Job posted successfully!");
-        setJobTitle("");
-        setPdfFile(null);
+        if (mountedRef.current) {
+          setMessageType("success");
+          setMessage("Job posted successfully!");
+          setJobTitle("");
+          setPdfFile(null);
+        }
         // Trigger refresh in parent component
         if (onJobPosted) {
           onJobPosted();
@@ -61,11 +88,15 @@ function PostJob({ company, onJobPosted }) {
     } 
     catch (err) {
       console.error(err);
-      setMessageType("error");
-      setMessage("Error posting job. Make sure backend is running.");
+      if (mountedRef.current) {
+        setMessageType("error");
+        setMessage(err?.message || "Error posting job. Make sure backend is running.");
+      }
     } 
     finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
 
   };

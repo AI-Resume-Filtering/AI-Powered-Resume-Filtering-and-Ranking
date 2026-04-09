@@ -12,6 +12,12 @@ for env_var in (
 ):
     os.environ.setdefault(env_var, "false" if env_var == "TOKENIZERS_PARALLELISM" else "1")
 
+# ⚠️ HuggingFace token: increases rate limits and model download speeds
+# Set HF_TOKEN environment variable in Render dashboard → Environment
+# Get token: https://huggingface.co/settings/tokens
+if os.getenv("HF_TOKEN"):
+    os.environ["HUGGING_FACE_HUB_TOKEN"] = os.getenv("HF_TOKEN")
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -32,6 +38,11 @@ def create_app():
 
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    if not app.config.get("SMTP_HOST") or not app.config.get("SMTP_FROM"):
+        app.logger.warning(
+            "SMTP is not fully configured; selected-candidate emails will not be delivered until SMTP_HOST and SMTP_FROM are set."
+        )
 
     # Enable CORS for frontend access
     # CORS_ORIGINS env var overrides defaults for production (comma-separated list)

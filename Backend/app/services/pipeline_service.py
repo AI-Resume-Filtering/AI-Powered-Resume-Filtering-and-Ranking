@@ -13,6 +13,7 @@ from Ai_Scoring.Ai_Scoring.scorer import process_resume_batch
 from Ai_Scoring.Ai_Scoring.semantic_matcher import semantic_similarity_score
 from Nlp_Engine.Nlp_service import process_resumes
 from Resume_Parser.resume_parser import ResumeParser
+from ..utils.email_queue import enqueue_or_send
 
 
 logger = logging.getLogger(__name__)
@@ -180,7 +181,7 @@ class PipelineService:
         body = self._fill_placeholders(template["body"], variables)
 
         try:
-            sent = self.email.send_email(candidate["email"], subject, body)
+            sent = enqueue_or_send(self.email, to=candidate["email"], subject=subject, body=body)
             if sent:
                 logger.info(
                     "Selection email sent to %s for job '%s' (score %.1f)",

@@ -1,0 +1,44 @@
+# Render deployment - exclude files that bloat the build
+# This file tells Render which files NOT to deploy
+
+# MongoDB local instance (must use MongoDB Atlas on Render instead)
+mongodb-data/
+mongodb-log/
+Backend/instance/
+
+# Development files
+.git/
+.gitignore
+.env
+.env.local
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+.DS_Store
+
+# Frontend source (only production build needed)
+Frontend/react-project/node_modules/
+Frontend/react-project/src/
+
+# Documentation (not needed at runtime)
+*.md
+Docs/
+docs/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Sample data
+Samples/
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.cache

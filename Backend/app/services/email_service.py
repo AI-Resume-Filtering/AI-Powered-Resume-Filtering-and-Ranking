@@ -16,6 +16,26 @@ class EmailService:
         self.sender = sender
         self.use_tls = use_tls
 
+    def _resolve_transport(self) -> tuple[str, int, str]:
+        """Resolve SMTP transport details with safe fallbacks for common providers."""
+        host = (self.host or "").strip()
+        sender = (self.sender or self.user or "").strip()
+        port = self.port
+
+        if not host and self.user:
+            user_domain = self.user.split("@")[-1].lower()
+            if user_domain == "gmail.com":
+                host = "smtp.gmail.com"
+                port = port or 587
+            elif user_domain in {"outlook.com", "hotmail.com", "live.com"}:
+                host = "smtp.office365.com"
+                port = port or 587
+            elif user_domain == "yahoo.com":
+                host = "smtp.mail.yahoo.com"
+                port = port or 587
+
+        return host, port, sender
+
     def send_email(
         self,
         to_address: str,
@@ -24,12 +44,14 @@ class EmailService:
         html_body: str | None = None,
         retries: int = 3,
     ) -> bool:
-        if not self.host or not self.sender:
+        host, port, sender = self._resolve_transport()
+
+        if not host or not sender:
             logger.warning("SMTP settings missing, skipping email")
             return False
 
         message = EmailMessage()
-        message["From"] = self.sender
+        message["From"] = sender
         message["To"] = to_address
         message["Subject"] = subject
         message.set_content(body)
@@ -37,8 +59,8 @@ class EmailService:
             message.add_alternative(html_body, subtype="html")
 
         try:
-            logger.info(f"Attempting to send email to {to_address} via {self.host}:{self.port}")
-            with smtplib.SMTP(self.host, self.port) as server:
+            logger.info(f"Attempting to send email to {to_address} via {host}:{port}")
+            with smtplib.SMTP(host, port) as server:
                 if self.use_tls:
                     server.starttls()
                 if self.user and self.password:

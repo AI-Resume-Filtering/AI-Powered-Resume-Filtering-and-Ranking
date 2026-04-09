@@ -28,9 +28,11 @@ function Home({ company, refreshTick = 0 }) {
 
     loadJobs();
     window.addEventListener("jobPosted", loadJobs);
+    window.addEventListener("jobDeleted", loadJobs);
 
     return () => {
       window.removeEventListener("jobPosted", loadJobs);
+      window.removeEventListener("jobDeleted", loadJobs);
     };
   }, [company, refreshTick]);
 
