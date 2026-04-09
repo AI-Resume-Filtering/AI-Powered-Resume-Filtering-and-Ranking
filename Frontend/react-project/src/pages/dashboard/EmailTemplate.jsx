@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import API from "../../api";
+import { useBackgroundTasks } from "../../context/BackgroundTasksContext";
 import "../../styles/EmailTemplate.css";
 
 const PLACEHOLDERS = [
@@ -18,9 +19,12 @@ function EmailTemplate({ company }) {
   const [message, setMessage]   = useState("");
   const [msgType, setMsgType]   = useState("info");
   const [preview, setPreview]   = useState(false);
+  const mountedRef = useRef(true);
+  const { runTask } = useBackgroundTasks();
 
   // Load existing template on mount
   useEffect(() => {
+    mountedRef.current = true;
     if (!company?.companyId) return;
     API.getEmailTemplate(company.companyId)
       .then((data) => {
@@ -29,8 +33,16 @@ function EmailTemplate({ company }) {
           setBody(data.template.body || "");
         }
       })
-      .catch(() => setMessage("Could not load saved template."))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (mountedRef.current) setMessage("Could not load saved template.");
+      })
+      .finally(() => {
+        if (mountedRef.current) setLoading(false);
+      });
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [company]);
 
   const handleSave = async () => {
@@ -42,7 +54,38 @@ function EmailTemplate({ company }) {
     setSaving(true);
     setMessage("");
     try {
-      const data = await API.saveEmailTemplate(company.companyId, subject, body);
+      const { promise } = runTask(
+        {
+          type: "email-template-save",
+          title: "Saving email template",
+          message: "Updating selection notification template...",
+          resume: {
+            kind: "api-call",
+            action: "saveEmailTemplate",
+            payload: {
+              companyId: company.companyId,
+              subject,
+              body,
+            },
+            successMessage: "Email template saved",
+          },
+        },
+        async ({ update }) => {
+          const data = await API.saveEmailTemplate(company.companyId, subject, body);
+          if (!data?.success) {
+            throw new Error(data?.message || "Failed to save template.");
+          }
+          update({ message: "Email template saved" });
+          return data;
+        }
+      );
+
+      const data = await promise;
+
+      if (!mountedRef.current) {
+        return;
+      }
+
       if (data.success) {
         setMsgType("success");
         setMessage("✅ Email template saved! Selected candidates will now receive this message.");
@@ -50,11 +93,15 @@ function EmailTemplate({ company }) {
         setMsgType("error");
         setMessage(data.message || "Failed to save template.");
       }
-    } catch {
-      setMsgType("error");
-      setMessage("Network error. Make sure the backend is running.");
+    } catch (error) {
+      if (mountedRef.current) {
+        setMsgType("error");
+        setMessage(error?.message || "Network error. Make sure the backend is running.");
+      }
     } finally {
-      setSaving(false);
+      if (mountedRef.current) {
+        setSaving(false);
+      }
     }
   };
 

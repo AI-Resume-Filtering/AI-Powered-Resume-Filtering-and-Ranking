@@ -119,19 +119,10 @@ def _ensure_local_mongo_started():
     print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
 
 
-# Eagerly warm up SBERT model at backend startup
-try:
-    from Ai_Scoring.Ai_Scoring.semantic_matcher import _get_model
-    _get_model()
-    try:
-        import torch
-        torch.set_num_threads(1)
-        torch.set_num_interop_threads(1)
-    except Exception:
-        pass
-    print("[startup] SBERT model loaded and cached.")
-except Exception as e:
-    print(f"[startup] SBERT model warmup failed: {e}")
+# ⚠️ DO NOT WARMUP SBERT MODEL AT STARTUP
+# Models are loaded lazily on first use (see semantic_matcher.py)
+# Warmup at startup causes OOM on 512MB Render instances
+# print("[startup] SBERT model will be loaded on first request (lazy loading).")
 
 
 from app import create_app
@@ -141,13 +132,21 @@ app = create_app() if __name__ != "__main__" else None
 
 
 if __name__ == "__main__":
-    _ensure_local_mongo_started()
+    # Only auto-start MongoDB for local development (not on Render)
+    if os.getenv("RENDER") != "true":
+        _ensure_local_mongo_started()
+    else:
+        print("[startup] Running on Render - MongoDB Atlas connection expected")
 
     app = create_app()
-    flask_debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    
+    # CRITICAL: Never use debug=True on Render (512MB memory limit)
+    # Debug mode uses development server with high memory & slower performance
+    is_production = os.getenv("RENDER") == "true" or os.getenv("FLASK_ENV") == "production"
+    flask_debug = False if is_production else os.getenv("FLASK_DEBUG", "0") == "1"
 
     port = int(os.environ.get("PORT", 5000))
 
-    print(f"[startup] Starting server on port {port}")
+    print(f"[startup] Starting server on port {port} (debug={flask_debug})")
 
     app.run(host="0.0.0.0", port=port, debug=flask_debug)

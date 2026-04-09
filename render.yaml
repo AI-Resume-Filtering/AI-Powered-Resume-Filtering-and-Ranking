@@ -1,0 +1,73 @@
+services:
+  - type: web
+    name: ai-resume-filtering
+    env: python
+    region: oregon  # Choose closest to your users
+    plan: starter   # Upgradeable for 512MB→1GB RAM
+    
+    # Runtime configuration
+    buildCommand: |
+      pip install --no-cache-dir -r Backend/requirements.txt && \
+      npm install --prefix Frontend/react-project && \
+      npm run build --prefix Frontend/react-project
+    
+    startCommand: cd Backend && python run.py
+    
+    healthCheckPath: /health
+    
+    # Environment variables (MUST configure in Render dashboard)
+    envVars:
+      - key: RENDER
+        value: "true"                    # Signals production environment
+      
+      - key: FLASK_ENV
+        value: "production"              # Disable Flask debug mode
+      
+      - key: PORT
+        value: "10000"                   # Render assigns dynamic port automatically
+      
+      - key: MONGODB_URI
+        sync: false                      # Set this in Render environment secrets!
+        # Example: mongodb+srv://user:pass@cluster.mongodb.net/resume_db?retryWrites=true
+      
+      - key: JWT_SECRET_KEY
+        sync: false                      # CRITICAL: Set in Render secrets, not git!
+      
+      - key: HF_TOKEN
+        sync: false                      # Set HuggingFace token in secrets for no rate limits
+      
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"                       # Reduce thread overhead (512MB constraint)
+      
+      - key: OMP_NUM_THREADS
+        value: "1"
+      
+      - key: TOKENIZERS_PARALLELISM
+        value: "false"
+      
+      - key: PYTHONUNBUFFERED
+        value: "1"                       # Ensure logs stream in real-time
+
+---
+# ⚠️ IMPORTANT SETUP INSTRUCTIONS
+# 
+# 1. **Go to https://render.com/dashboard and create Web Service**
+# 
+# 2. **Connect your GitHub repo**
+# 
+# 3. **In Service Settings → Environment:**
+#    - Add all variables from above (marked sync: false require secrets)
+#    
+#    CRITICAL secrets to add:
+#    - MONGODB_URI = mongodb+srv://user:password@cluster.mongodb.net/dbname
+#    - JWT_SECRET_KEY = (generate random strong key)
+#    - HF_TOKEN = (get from https://huggingface.co/settings/tokens)
+# 
+# 4. **Auto-deploy on git push:**
+#    - Render auto-redeploys on commits to main/master
+# 
+# 5. **Scale up if OOM persists:**
+#    - If still hitting 512MB limit, upgrade to "Starter" plan in Render dashboard
+#    - Alternatively: Pre-load SBERT model to MongoDB and stream embeddings
+#    - Or use lighter model: sentence-transformers/MiniLM-L6-v2 is fastest
+

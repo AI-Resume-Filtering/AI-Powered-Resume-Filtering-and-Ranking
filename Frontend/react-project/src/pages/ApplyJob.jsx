@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import API, { API_BASE_URL } from "../api";
+import API from "../api";
+import { useBackgroundTasks } from "../context/BackgroundTasksContext";
 import "../styles/applyjob.css"; // linked CSS file
 
 function ApplyJob() {
@@ -28,13 +29,15 @@ function ApplyJob() {
   const [hasResumeError, setHasResumeError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const pollRef = useRef(null);
+  const mountedRef = useRef(true);
+  const { runTask } = useBackgroundTasks();
 
   const updateFormMessage = (title, body = "", tone = "info") => {
     setFormMsg({ title, body, tone });
   };
 
   useEffect(() => {
+    mountedRef.current = true;
     if (!jobId) return;
 
     API.getJobDetails(jobId)
@@ -78,14 +81,66 @@ function ApplyJob() {
       formData.append("resume", resumeFile);
 
       try {
-        const response = await fetch(`${API_BASE_URL}/apply`, {
-          method: "POST",
-          body: formData,
-        });
+        const companyName = jobData.companyName || "this company";
+        const jobTitle = jobData.title || "this position";
 
-        const data = await response.json();
+        const successMessage = `Completed. ${companyName} will contact you if shortlisted.`;
 
-        if (!response.ok) {
+        const { promise } = runTask(
+          {
+            type: "job-application",
+            title: `Application: ${jobTitle}`,
+            message: "Submitting your application...",
+          },
+          async ({ taskId, update, sleep }) => {
+            const data = await API.applyForJob(formData);
+
+            if (!data?.success) {
+              throw new Error(
+                data?.message ||
+                  "Application could not be submitted. Please check your details and try again."
+              );
+            }
+
+            if (data.status === 202 && data.applicationId) {
+              update({
+                message: "Application submitted. AI analysis is running...",
+                resume: {
+                  kind: "application-status",
+                  taskId,
+                  applicationId: data.applicationId,
+                  successMessage,
+                },
+              });
+
+              for (;;) {
+                const result = await API.getApplicationStatus(data.applicationId);
+                if (result?.status === "processing") {
+                  await sleep(3000);
+                  continue;
+                }
+                if (result?.status === "error") {
+                  throw new Error("Resume processing failed. Please try again.");
+                }
+                break;
+              }
+            }
+
+            update({
+              message: successMessage,
+            });
+
+            return data;
+          }
+        );
+
+        const data = await promise;
+
+        if (!mountedRef.current) {
+          return;
+        }
+
+        if (!data?.success) {
           const message =
             data?.message ||
             "Application could not be submitted. Please check your details and try again.";
@@ -103,81 +158,33 @@ function ApplyJob() {
           return;
         }
 
-        if (response.status === 202 && data.applicationId) {
-          setHasResumeError(false);
-          setIsSubmitting(false);
-          setIsProcessing(true);
-          updateFormMessage(
-            "Application received",
-            "Your resume has been submitted successfully and is now being analysed. Please wait a moment.",
-            "processing"
-          );
-          _startPolling(data.applicationId);
-          return;
-        }
-
-        const companyName = jobData.companyName || "the company";
-        const jobTitle = jobData.title || "this role";
         updateFormMessage(
           "Application submitted successfully",
           data.message ||
-            `Thank you for applying to ${companyName} for the ${jobTitle} position. Your profile is under review, and if you are selected, our team will contact you soon.` ,
+            `Thank you for applying to ${companyName} for the ${jobTitle} position. Your profile is under review, and if you are selected, our team will contact you soon.`,
           "success"
         );
         setTimeout(redirectToPreviousPage, 3000);
       } catch (err) {
         console.error(err);
-        updateFormMessage(
-          "Application could not be submitted",
-          "Please make sure the backend is running and try again.",
-          "error"
-        );
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-
-    const _startPolling = (applicationId) => {
-      pollRef.current = setInterval(async () => {
-        try {
-          const result = await API.getApplicationStatus(applicationId);
-          if (!result || result.status === "processing") return;
-
-          clearInterval(pollRef.current);
-          setIsProcessing(false);
-
-          if (result.status === "error") {
-            updateFormMessage(
-              "Resume processing failed",
-              "Please try again or contact support if the issue continues.",
-              "error"
-            );
-            return;
-          }
-
-          const companyName = jobData.companyName || "this company";
-          const jobTitle = jobData.title || "this position";
+        if (mountedRef.current) {
           updateFormMessage(
-            "Application submitted successfully",
-            `Thank you for applying to ${companyName} for the ${jobTitle} position. ${companyName} uses AI intelligence to review applications carefully. If you are selected, our team will connect with you soon. Redirecting you back now...`,
-            "success"
-          );
-          setTimeout(redirectToPreviousPage, 4000);
-        } catch {
-          clearInterval(pollRef.current);
-          setIsProcessing(false);
-          updateFormMessage(
-            "Status check interrupted",
-            "Connection was lost while checking your application status. Please contact support.",
+            "Application could not be submitted",
+            err?.message || "Please make sure the backend is running and try again.",
             "error"
           );
         }
-      }, 3000);
+      } finally {
+        if (mountedRef.current) {
+          setIsSubmitting(false);
+          setIsProcessing(false);
+        }
+      }
     };
 
     useEffect(() => {
       return () => {
-        if (pollRef.current) clearInterval(pollRef.current);
+        mountedRef.current = false;
       };
     }, []);
 
