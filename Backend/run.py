@@ -125,11 +125,7 @@ def _ensure_local_mongo_started():
 # print("[startup] SBERT model will be loaded on first request (lazy loading).")
 
 
-from app import create_app
-
 load_dotenv()
-app = create_app() if __name__ != "__main__" else None
-
 
 if __name__ == "__main__":
     # Only auto-start MongoDB for local development (not on Render)
@@ -138,7 +134,16 @@ if __name__ == "__main__":
     else:
         print("[startup] Running on Render - MongoDB Atlas connection expected")
 
-    app = create_app()
+    try:
+        print("[startup] Importing Flask app...")
+        from app import create_app
+        app = create_app()
+        print("[startup] Flask app created successfully")
+    except Exception as e:
+        print(f"[startup] ERROR creating Flask app: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
     
     # CRITICAL: Never use debug=True on Render (512MB memory limit)
     # Debug mode uses development server with high memory & slower performance
@@ -147,6 +152,12 @@ if __name__ == "__main__":
 
     port = int(os.environ.get("PORT", 5000))
 
-    print(f"[startup] Starting server on port {port} (debug={flask_debug})")
+    print(f"[startup] Starting server on 0.0.0.0:{port} (debug={flask_debug})", flush=True)
 
-    app.run(host="0.0.0.0", port=port, debug=flask_debug)
+    try:
+        app.run(host="0.0.0.0", port=port, debug=flask_debug)
+    except Exception as e:
+        print(f"[startup] ERROR starting server: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
