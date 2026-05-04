@@ -1,4 +1,20 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+/**
+ * Determine the API base URL from environment variables
+ * 
+ * Priority:
+ * 1. If VITE_BACKEND_URL is set (deployed backend), use it with /api suffix
+ * 2. Otherwise, use VITE_API_BASE_URL (local development defaults to /api)
+ */
+const getAPIBaseURL = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL?.trim();
+  if (backendUrl) {
+    // Remove trailing slash if present, then append /api
+    return backendUrl.replace(/\/$/, '') + '/api';
+  }
+  return import.meta.env.VITE_API_BASE_URL || '/api';
+};
+
+const API_BASE_URL = getAPIBaseURL();
 
 async function readJsonResponse(response) {
   const text = await response.text();
