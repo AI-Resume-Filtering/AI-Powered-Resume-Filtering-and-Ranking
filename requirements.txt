@@ -42,4 +42,5 @@ joblib>=1.3.0                # Save/load trained model bundles
 # --------------------------
 # Utilities
 # --------------------------
+gunicorn>=22.0.0             # Production WSGI server (replaces Flask dev server on Render)
 

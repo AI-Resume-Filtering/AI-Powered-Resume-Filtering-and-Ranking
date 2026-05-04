@@ -23,9 +23,10 @@ application_bp = Blueprint("application", __name__)
 logger = logging.getLogger(__name__)
 
 # Bounded thread pool for background resume-processing pipelines.
-# Limiting concurrency to 2 workers caps peak memory from simultaneous
-# PDF parsing + SBERT inference on a 512 MB host.
-_pipeline_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="pipeline")
+# Limiting concurrency to 1 worker ensures only one heavy PDF-parse + SBERT
+# inference pipeline runs at a time.  Running two concurrently on a 512 MB
+# host caused OOM restarts (each pipeline can spike ~150–200 MB on its own).
+_pipeline_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pipeline")
 atexit.register(_pipeline_executor.shutdown, wait=False)
 
 def _display_resume_name(filename):
