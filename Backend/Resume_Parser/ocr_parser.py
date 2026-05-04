@@ -156,7 +156,7 @@ def extract_text_ocr(pdf_path: str) -> str:
                     text_parts.append(page_text)
             finally:
                 del image
-                pixmap = None
+                del pixmap
     finally:
         document.close()
 
@@ -178,6 +178,6 @@ def extract_page_ocr(pdf_path: str, page_num: int) -> str:
             return image_to_text(image, psm=4)
         finally:
             del image
-            pixmap = None
+            del pixmap
     finally:
         document.close()
