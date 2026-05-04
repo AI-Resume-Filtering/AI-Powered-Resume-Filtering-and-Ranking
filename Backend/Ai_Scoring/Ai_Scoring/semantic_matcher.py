@@ -4,6 +4,11 @@ from difflib import SequenceMatcher
 
 logger = logging.getLogger(__name__)
 
+# all-MiniLM-L6-v2 has a max_seq_length of 256 tokens (~1 500–2 000 chars).
+# Passing longer strings only wastes tokeniser time and temporary tensor
+# memory without improving the similarity result.
+_MAX_SBERT_CHARS = 2000
+
 @lru_cache(maxsize=1)
 def _get_model(model_name: str = "all-MiniLM-L6-v2"):
     try:
@@ -23,8 +28,8 @@ def semantic_similarity_score(resume_text: str, job_description: str, model_name
     Compute similarity in [0, 1] between resume and job description.
     Uses sentence-transformers when available, otherwise uses a lightweight fallback.
     """
-    resume_text = (resume_text or "").strip()
-    job_description = (job_description or "").strip()
+    resume_text = (resume_text or "").strip()[:_MAX_SBERT_CHARS]
+    job_description = (job_description or "").strip()[:_MAX_SBERT_CHARS]
     if not resume_text or not job_description:
         return 0.0
 
