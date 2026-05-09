@@ -3,19 +3,25 @@ import logging
 import math
 import os
 import re
-import urllib.error
 import urllib.request
 from collections import Counter
 from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
+# all-MiniLM-L6-v2 has a max_seq_length of 256 tokens (~1 500–2 000 chars).
+# Passing longer strings only wastes tokeniser time and temporary tensor
+# memory without improving the similarity result.
+_MAX_SBERT_CHARS = 2000
 
 # ── External API helpers ──────────────────────────────────────────────────────
 
-def _openai_embed(text: str, api_key: str, model: str = "text-embedding-3-small") -> list:
-    """Return a text embedding via the OpenAI Embeddings API."""
-    payload = json.dumps({"input": text[:8191], "model": model}).encode()
+def _openai_embed_pair(text1: str, text2: str, api_key: str, model: str = "text-embedding-3-small") -> tuple:
+    """Return embeddings for two texts in a single OpenAI API call (batched)."""
+    payload = json.dumps({
+        "input": [text1[:8191], text2[:8191]],
+        "model": model,
+    }).encode()
     req = urllib.request.Request(
         "https://api.openai.com/v1/embeddings",
         data=payload,
@@ -26,13 +32,14 @@ def _openai_embed(text: str, api_key: str, model: str = "text-embedding-3-small"
     )
     with urllib.request.urlopen(req, timeout=30) as resp:
         data = json.loads(resp.read())
-    return data["data"][0]["embedding"]
+    items = sorted(data["data"], key=lambda x: x["index"])
+    return items[0]["embedding"], items[1]["embedding"]
 
 
-def _cohere_embed(text: str, api_key: str, model: str = "embed-english-light-v3.0") -> list:
-    """Return a text embedding via the Cohere Embed API v2."""
+def _cohere_embed_pair(text1: str, text2: str, api_key: str, model: str = "embed-english-light-v3.0") -> tuple:
+    """Return embeddings for two texts in a single Cohere API call (batched)."""
     payload = json.dumps({
-        "texts": [text[:2048]],
+        "texts": [text1[:2048], text2[:2048]],
         "model": model,
         "input_type": "search_document",
         "embedding_types": ["float"],
@@ -47,7 +54,8 @@ def _cohere_embed(text: str, api_key: str, model: str = "embed-english-light-v3.
     )
     with urllib.request.urlopen(req, timeout=30) as resp:
         data = json.loads(resp.read())
-    return data["embeddings"]["float"][0]
+    floats = data["embeddings"]["float"]
+    return floats[0], floats[1]
 
 
 def _cosine_from_lists(a: list, b: list) -> float:
@@ -93,9 +101,8 @@ def _get_model(model_name: str = "all-MiniLM-L6-v2"):
     """Load a local sentence-transformers model if the package is installed.
 
     Returns ``(model, util)`` on success, ``None`` if the package is absent.
-    This function is kept for backward-compatibility (run.py may call it).
     On Render deployments sentence-transformers is not installed; the function
-    returns None silently so the API/fallback path is used instead.
+    returns None silently so the API/TF-IDF fallback path is used instead.
     """
     try:
         from sentence_transformers import SentenceTransformer, util
@@ -108,7 +115,7 @@ def _get_model(model_name: str = "all-MiniLM-L6-v2"):
 
 # ── Provider-agnostic embedding ───────────────────────────────────────────────
 
-def get_embedding(text: str) -> list | None:
+def get_embedding(text: str) -> "list | None":
     """Return a text embedding using the configured provider.
 
     Provider resolution order (first match wins):
@@ -127,20 +134,78 @@ def get_embedding(text: str) -> list | None:
     openai_key = os.getenv("OPENAI_API_KEY", "")
     cohere_key = os.getenv("COHERE_API_KEY", "")
 
-    if provider == "openai" or (not provider and openai_key):
-        if openai_key:
+    if provider == "openai":
+        if not openai_key:
+            logger.warning(
+                "EMBEDDINGS_PROVIDER=openai is set but OPENAI_API_KEY is empty; "
+                "falling back to next available provider."
+            )
+        else:
             try:
-                return _openai_embed(text, openai_key)
+                payload = json.dumps({"input": text[:8191], "model": "text-embedding-3-small"}).encode()
+                req = urllib.request.Request(
+                    "https://api.openai.com/v1/embeddings",
+                    data=payload,
+                    headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    return json.loads(resp.read())["data"][0]["embedding"]
             except Exception:
                 logger.exception("OpenAI embedding failed; trying next provider")
 
-    if provider == "cohere" or (not provider and cohere_key):
-        if cohere_key:
+    if provider == "cohere":
+        if not cohere_key:
+            logger.warning(
+                "EMBEDDINGS_PROVIDER=cohere is set but COHERE_API_KEY is empty; "
+                "falling back to next available provider."
+            )
+        else:
             try:
-                return _cohere_embed(text, cohere_key)
+                payload = json.dumps({
+                    "texts": [text[:2048]], "model": "embed-english-light-v3.0",
+                    "input_type": "search_document", "embedding_types": ["float"],
+                }).encode()
+                req = urllib.request.Request(
+                    "https://api.cohere.ai/v2/embed",
+                    data=payload,
+                    headers={"Authorization": f"Bearer {cohere_key}", "Content-Type": "application/json"},
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    return json.loads(resp.read())["embeddings"]["float"][0]
             except Exception:
                 logger.exception("Cohere embedding failed; trying next provider")
 
+    # Auto-detect: try OpenAI then Cohere by key presence (no explicit provider pinned)
+    if not provider:
+        if openai_key:
+            try:
+                payload = json.dumps({"input": text[:8191], "model": "text-embedding-3-small"}).encode()
+                req = urllib.request.Request(
+                    "https://api.openai.com/v1/embeddings",
+                    data=payload,
+                    headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    return json.loads(resp.read())["data"][0]["embedding"]
+            except Exception:
+                logger.exception("OpenAI embedding failed; trying next provider")
+        if cohere_key:
+            try:
+                payload = json.dumps({
+                    "texts": [text[:2048]], "model": "embed-english-light-v3.0",
+                    "input_type": "search_document", "embedding_types": ["float"],
+                }).encode()
+                req = urllib.request.Request(
+                    "https://api.cohere.ai/v2/embed",
+                    data=payload,
+                    headers={"Authorization": f"Bearer {cohere_key}", "Content-Type": "application/json"},
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    return json.loads(resp.read())["embeddings"]["float"][0]
+            except Exception:
+                logger.exception("Cohere embedding failed; trying next provider")
+
+    # Local SBERT (dev fallback)
     if provider in ("", "local"):
         bundle = _get_model()
         if bundle is not None:
@@ -153,13 +218,47 @@ def get_embedding(text: str) -> list | None:
     return None
 
 
+def _get_similarity_embeddings(text1: str, text2: str) -> "tuple[list, list] | tuple[None, None]":
+    """Return embeddings for two texts using a single batched API call where supported.
 
-def semantic_similarity_score(
-    resume_text: str,
-    job_description: str,
-    model_name: str = "all-MiniLM-L6-v2",
-) -> float:
+    Batching avoids sending two separate HTTP requests for the common case of
+    computing similarity between a resume and a job description.
+    Falls back to two individual ``get_embedding`` calls when batching is not
+    possible (e.g. local SBERT path).
+    """
+    provider = os.getenv("EMBEDDINGS_PROVIDER", "").lower()
+    openai_key = os.getenv("OPENAI_API_KEY", "")
+    cohere_key = os.getenv("COHERE_API_KEY", "")
+
+    if provider == "openai" or (not provider and openai_key):
+        if openai_key:
+            try:
+                e1, e2 = _openai_embed_pair(text1, text2, openai_key)
+                return e1, e2
+            except Exception:
+                logger.exception("Batched OpenAI embedding failed; trying next provider")
+
+    if provider == "cohere" or (not provider and cohere_key):
+        if cohere_key:
+            try:
+                e1, e2 = _cohere_embed_pair(text1, text2, cohere_key)
+                return e1, e2
+            except Exception:
+                logger.exception("Batched Cohere embedding failed; trying next provider")
+
+    # Local SBERT or no provider — fall back to individual calls
+    e1 = get_embedding(text1)
+    e2 = get_embedding(text2)
+    if e1 is not None and e2 is not None:
+        return e1, e2
+    return None, None
+
+
+def semantic_similarity_score(resume_text: str, job_description: str) -> float:
     """Compute semantic similarity in [0, 1] between a resume and a job description.
+
+    Uses a single batched API call when possible (OpenAI/Cohere) to reduce
+    latency and cost. Falls back to TF-IDF cosine when no provider is available.
 
     Provider order:
 
@@ -168,14 +267,13 @@ def semantic_similarity_score(
     3. Local sentence-transformers (if installed)
     4. TF-IDF keyword cosine  (always available — zero extra dependencies)
     """
-    resume_text = (resume_text or "").strip()
-    job_description = (job_description or "").strip()
+    resume_text = (resume_text or "").strip()[:_MAX_SBERT_CHARS]
+    job_description = (job_description or "").strip()[:_MAX_SBERT_CHARS]
     if not resume_text or not job_description:
         return 0.0
 
     try:
-        r_emb = get_embedding(resume_text)
-        j_emb = get_embedding(job_description)
+        r_emb, j_emb = _get_similarity_embeddings(resume_text, job_description)
         if r_emb is not None and j_emb is not None:
             sim = _cosine_from_lists(r_emb, j_emb)
             return round(max(0.0, min(float(sim), 1.0)), 6)

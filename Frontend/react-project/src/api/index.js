@@ -1,16 +1,39 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+/**
+ * Determine the API base URL from environment variables
+ * 
+ * Priority:
+ * 1. If VITE_BACKEND_URL is set (deployed backend), use it with /api suffix
+ * 2. Otherwise, use VITE_API_BASE_URL (local development defaults to /api)
+ */
+const getAPIBaseURL = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL?.trim();
+  if (backendUrl) {
+    // Remove trailing slash if present, then append /api
+    return backendUrl.replace(/\/$/, '') + '/api';
+  }
+  return import.meta.env.VITE_API_BASE_URL || '/api';
+};
+
+const API_BASE_URL = getAPIBaseURL();
+
+async function readJsonResponse(response) {
+  const text = await response.text();
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
 
 class API {
   static async _requestJson(path, options = {}) {
     try {
       const response = await fetch(`${API_BASE_URL}${path}`, options);
-      let payload = {};
-
-      try {
-        payload = await response.json();
-      } catch {
-        payload = {};
-      }
+      const payload = await readJsonResponse(response);
 
       if (!response.ok) {
         return {
@@ -92,12 +115,12 @@ class API {
 
     const suffix = query.toString() ? `?${query.toString()}` : "";
     const response = await fetch(`${API_BASE_URL}/jobs${suffix}`);
-    return response.json();
+    return readJsonResponse(response);
   }
 
   static async getJobDetails(jobId) {
     const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
-    return response.json();
+    return readJsonResponse(response);
   }
 
   /** S4: Sends auth token so backend can verify ownership. */
@@ -131,29 +154,94 @@ class API {
   }
 
   static async postJob(formData) {
-    const response = await fetch(`${API_BASE_URL}/company/post-job`, {
-      method: 'POST',
-      headers: { ...API._authHeader() },
-      body: formData,
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/post-job`, {
+        method: 'POST',
+        headers: { ...API._authHeader() },
+        body: formData,
+      });
+
+      const payload = await readJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          message: payload.message || `Request failed (${response.status})`,
+          ...payload,
+        };
+      }
+
+      return { status: response.status, ...payload };
+    } catch {
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
   }
 
   static async deleteJob(jobId) {
-    const response = await fetch(`${API_BASE_URL}/company/delete-job`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json', ...API._authHeader() },
-      body: JSON.stringify({ jobId }),
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/delete-job`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', ...API._authHeader() },
+        body: JSON.stringify({ jobId }),
+      });
+
+      const payload = await readJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          message: payload.message || `Request failed (${response.status})`,
+          ...payload,
+        };
+      }
+
+      return { status: response.status, ...payload };
+    } catch {
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
   }
 
   static async applyForJob(formData) {
-    const response = await fetch(`${API_BASE_URL}/apply`, {
-      method: 'POST',
-      body: formData,
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/apply`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      let payload = {};
+      try {
+        payload = await response.json();
+      } catch {
+        payload = {};
+      }
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          message: payload.message || `Request failed (${response.status})`,
+          ...payload,
+        };
+      }
+
+      return { status: response.status, ...payload };
+    } catch {
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
   }
 
   /** A3: Poll the async pipeline status for a submitted application. */
@@ -247,12 +335,32 @@ class API {
 
   /** Email template: save/update the company's selection notification template. */
   static async saveEmailTemplate(companyId, subject, body) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/email-template`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...API._authHeader() },
-      body: JSON.stringify({ subject, body }),
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/${companyId}/email-template`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...API._authHeader() },
+        body: JSON.stringify({ subject, body }),
+      });
+
+      const payload = await readJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          message: payload.message || `Request failed (${response.status})`,
+          ...payload,
+        };
+      }
+
+      return { status: response.status, ...payload };
+    } catch {
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
   }
 
   static async getCompanyScoreThreshold(companyId) {
@@ -280,12 +388,32 @@ class API {
   }
 
   static async saveCompanyScoreThreshold(companyId, scoreThreshold) {
-    const response = await fetch(`${API_BASE_URL}/company/${companyId}/score-threshold`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...API._authHeader() },
-      body: JSON.stringify({ scoreThreshold }),
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/company/${companyId}/score-threshold`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...API._authHeader() },
+        body: JSON.stringify({ scoreThreshold }),
+      });
+
+      const payload = await readJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          message: payload.message || `Request failed (${response.status})`,
+          ...payload,
+        };
+      }
+
+      return { status: response.status, ...payload };
+    } catch {
+      return {
+        success: false,
+        status: 0,
+        message: 'Cannot reach backend server. Ensure Backend is running on port 5000.',
+      };
+    }
   }
 
   static async healthCheck() {

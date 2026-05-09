@@ -3,7 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 BACKEND_ROOT = BASE_DIR.parent
-PROJECT_ROOT = BACKEND_ROOT
+PROJECT_ROOT = BACKEND_ROOT.parent
 
 INSTANCE_DIR = BACKEND_ROOT / "instance"
 STORAGE_DIR = INSTANCE_DIR / "storage"

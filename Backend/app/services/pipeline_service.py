@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 # Import AI modules from project root
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -13,6 +13,7 @@ from Ai_Scoring.Ai_Scoring.scorer import process_resume_batch
 from Ai_Scoring.Ai_Scoring.semantic_matcher import semantic_similarity_score
 from Nlp_Engine.Nlp_service import process_resumes
 from Resume_Parser.resume_parser import ResumeParser
+from ..utils.email_queue import enqueue_or_send
 
 
 logger = logging.getLogger(__name__)
@@ -65,7 +66,8 @@ class PipelineService:
         output_path = nlp_response.get("output_path", "")
 
         # L8: Use pathlib for cross-platform path assembly (handles / and \ equally)
-        output_file = (Path(self.project_root) / output_path).resolve()
+        # NLP output is relative to Backend directory, so join with Backend path
+        output_file = (Path(self.project_root) / "Backend" / output_path).resolve()
         logger.info("NLP output file: %s (exists: %s)", output_file, output_file.exists())
 
         if not output_file.exists():
@@ -179,7 +181,7 @@ class PipelineService:
         body = self._fill_placeholders(template["body"], variables)
 
         try:
-            sent = self.email.send_email(candidate["email"], subject, body)
+            sent = enqueue_or_send(self.email, to=candidate["email"], subject=subject, body=body)
             if sent:
                 logger.info(
                     "Selection email sent to %s for job '%s' (score %.1f)",

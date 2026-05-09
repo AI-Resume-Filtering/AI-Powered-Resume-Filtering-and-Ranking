@@ -23,9 +23,8 @@ def _get_embedding(text: str):
 
 
 class JobDescriptionDeduplicator:
-    def __init__(self, collection, model_name="all-MiniLM-L6-v2", similarity_threshold=0.9):
+    def __init__(self, collection, similarity_threshold=0.9):
         self.collection = collection
-        self.model_name = model_name
         self.similarity_threshold = similarity_threshold
 
     def compute_embedding(self, text) -> "np.ndarray | None":
@@ -47,6 +46,8 @@ class JobDescriptionDeduplicator:
         if new_emb is None:
             logger.warning("No embedding provider available — JD deduplication skipped")
             return None, None
+
+        new_emb = np.asarray(new_emb, dtype=np.float32)
 
         filter_query = {}
         if company_id:

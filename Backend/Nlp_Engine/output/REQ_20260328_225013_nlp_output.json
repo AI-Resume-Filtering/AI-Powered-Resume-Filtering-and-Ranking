@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "request_id": "REQ_20260328_225013",
+    "processed_at": "2026-03-28T22:50:14.284053",
+    "total_resumes": 1,
+    "successfully_parsed": 1,
+    "failed": 0
+  },
+  "job_requirements": {
+    "job_title": "Data Scientist",
+    "required_skills": [
+      "python",
+      "machine learning",
+      "deep learning",
+      "tensorflow",
+      "pytorch",
+      "sql",
+      "pandas",
+      "numpy"
+    ],
+    "preferred_skills": [
+      "natural language processing",
+      "nlp",
+      "computer vision",
+      "docker",
+      "aws"
+    ],
+    "minimum_experience": 3,
+    "required_education": "bachelors",
+    "responsibilities": [],
+    "total_requirements": 13
+  },
+  "resumes": {
+    "resume_001": {
+      "resume_filename": "resume_f9f5d25c329b48348f96d67e80de65f4.txt",
+      "sequential_id": "001",
+      "contact_info": {
+        "email": "ughademayur67@gmail.com",
+        "phone": "+91) 7823029229"
+      },
+      "skills": [
+        "python",
+        "java",
+        "javascript",
+        "c++",
+        "artificial intelligence",
+        "natural language processing",
+        "nlp",
+        "sql",
+        "mysql",
+        "mongodb",
+        "oracle",
+        "flask",
+        "django",
+        "spring",
+        "jsp",
+        "servlets",
+        "jdbc",
+        "html",
+        "git",
+        "github",
+        "pandas",
+        "numpy",
+        "matplotlib",
+        "rest api"
+      ],
+      "skill_categories": {
+        "programming_language": 4,
+        "ai_ml": 6,
+        "database": 4,
+        "backend": 7,
+        "frontend": 1,
+        "tools": 2
+      },
+      "experience_years": 2,
+      "skill_experience": {},
+      "education_level": "bachelors",
+      "job_match": {
+        "meets_requirements": false,
+        "matched_required_skills": [
+          "python",
+          "pandas",
+          "sql",
+          "numpy"
+        ],
+        "matched_preferred_skills": [
+          "natural language processing",
+          "nlp"
+        ],
+        "missing_required_skills": [
+          "machine learning",
+          "tensorflow",
+          "pytorch",
+          "deep learning"
+        ],
+        "match_percentage": 50.0,
+        "experience_match": false,
+        "education_match": true
+      },
+      "scoring_ready": true
+    }
+  }
+}

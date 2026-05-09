@@ -10,14 +10,12 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # Limit native math library and tokenizer thread usage before any NumPy/PyTorch imports.
-# Keeping these at 1 thread prevents large per-thread stack allocations and
-# reduces steady-state RSS to stay comfortably within the 512 MB target.
 for env_var in (
     "OPENBLAS_NUM_THREADS",
     "OMP_NUM_THREADS",
     "MKL_NUM_THREADS",
     "NUMEXPR_NUM_THREADS",
-    "TOKENIZERS_PARALLELISM",  # prevents HuggingFace fast-tokenizer from spawning workers
+    "TOKENIZERS_PARALLELISM",
 ):
     os.environ.setdefault(env_var, "false" if env_var == "TOKENIZERS_PARALLELISM" else "1")
 
@@ -34,7 +32,7 @@ def _is_port_open(host: str, port: int, timeout: float = 0.6) -> bool:
         return False
 
 
-def _parse_mongo_target(uri: str) -> tuple[str, int] | tuple[None, None]:
+def _parse_mongo_target(uri: str):
     # Only auto-start for direct local mongodb://host:port URIs.
     if not uri or not uri.startswith("mongodb://"):
         return None, None
@@ -47,7 +45,7 @@ def _parse_mongo_target(uri: str) -> tuple[str, int] | tuple[None, None]:
     return host, port
 
 
-def _find_mongod_exe() -> str | None:
+def _find_mongod_exe():
     env_path = os.getenv("MONGOD_PATH", "").strip()
     if env_path and os.path.exists(env_path):
         return env_path
@@ -64,7 +62,7 @@ def _find_mongod_exe() -> str | None:
     return which("mongod")
 
 
-def _ensure_local_mongo_started() -> None:
+def _ensure_local_mongo_started():
     auto_start = os.getenv("AUTO_START_MONGO", "true").strip().lower() in {"1", "true", "yes", "on"}
     if not auto_start:
         return
@@ -121,14 +119,38 @@ def _ensure_local_mongo_started() -> None:
     print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
 
 
-from app import create_app
-
 load_dotenv()
-app = create_app() if __name__ != "__main__" else None
-
 
 if __name__ == "__main__":
-    _ensure_local_mongo_started()
-    app = create_app()
-    flask_debug = os.getenv("FLASK_DEBUG", "0") == "1"
-    app.run(host="0.0.0.0", port=5000, debug=flask_debug)
+    # Only auto-start MongoDB for local development (not on Render)
+    if os.getenv("RENDER") != "true":
+        _ensure_local_mongo_started()
+    else:
+        print("[startup] Running on Render - MongoDB Atlas connection expected")
+
+    try:
+        print("[startup] Importing Flask app...")
+        from app import create_app
+        app = create_app()
+        print("[startup] Flask app created successfully")
+    except Exception as e:
+        print(f"[startup] ERROR creating Flask app: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+    # CRITICAL: Never use debug=True on Render (512MB memory limit)
+    is_production = os.getenv("RENDER") == "true" or os.getenv("FLASK_ENV") == "production"
+    flask_debug = False if is_production else os.getenv("FLASK_DEBUG", "0") == "1"
+
+    port = int(os.environ.get("PORT", 5000))
+
+    print(f"[startup] Starting server on 0.0.0.0:{port} (debug={flask_debug})", flush=True)
+
+    try:
+        app.run(host="0.0.0.0", port=port, debug=flask_debug)
+    except Exception as e:
+        print(f"[startup] ERROR starting server: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)

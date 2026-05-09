@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import API from "../../api";
+import { useBackgroundTasks } from "../../context/BackgroundTasksContext";
 import "../../styles/dashboard.css";
 
 function normalizeErrorMessage(data, fallback) {
@@ -19,8 +20,11 @@ function ScoreThreshold({ company }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const mountedRef = useRef(true);
+  const { runTask } = useBackgroundTasks();
 
   useEffect(() => {
+    mountedRef.current = true;
     if (!company?.companyId) return;
 
     API.getCompanyScoreThreshold(company.companyId)
@@ -33,10 +37,20 @@ function ScoreThreshold({ company }) {
         }
       })
       .catch(() => {
-        setIsError(true);
-        setMessage("Network error while loading threshold.");
+        if (mountedRef.current) {
+          setIsError(true);
+          setMessage("Network error while loading threshold.");
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (mountedRef.current) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [company]);
 
   const handleSave = async () => {
@@ -52,7 +66,37 @@ function ScoreThreshold({ company }) {
 
     setSaving(true);
     try {
-      const data = await API.saveCompanyScoreThreshold(company.companyId, numeric);
+      const { promise } = runTask(
+        {
+          type: "score-threshold-save",
+          title: "Saving score threshold",
+          message: "Updating candidate selection threshold...",
+          resume: {
+            kind: "api-call",
+            action: "saveCompanyScoreThreshold",
+            payload: {
+              companyId: company.companyId,
+              scoreThreshold: numeric,
+            },
+            successMessage: `Threshold updated to ${numeric}`,
+          },
+        },
+        async ({ update }) => {
+          const data = await API.saveCompanyScoreThreshold(company.companyId, numeric);
+          if (!data?.success) {
+            throw new Error(normalizeErrorMessage(data, "Could not save threshold."));
+          }
+          update({ message: `Threshold updated to ${data.scoreThreshold}` });
+          return data;
+        }
+      );
+
+      const data = await promise;
+
+      if (!mountedRef.current) {
+        return;
+      }
+
       if (data?.success) {
         setThreshold(String(data.scoreThreshold));
         setMessage("Threshold saved successfully.");
@@ -66,11 +110,15 @@ function ScoreThreshold({ company }) {
         setIsError(true);
         setMessage(normalizeErrorMessage(data, "Could not save threshold."));
       }
-    } catch {
-      setIsError(true);
-      setMessage("Network error while saving threshold.");
+    } catch (error) {
+      if (mountedRef.current) {
+        setIsError(true);
+        setMessage(error?.message || "Network error while saving threshold.");
+      }
     } finally {
-      setSaving(false);
+      if (mountedRef.current) {
+        setSaving(false);
+      }
     }
   };
 

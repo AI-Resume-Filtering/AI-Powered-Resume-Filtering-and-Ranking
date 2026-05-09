@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import API from "../../api";
+import { useBackgroundTasks } from "../../context/BackgroundTasksContext";
 import "../../styles/DeleteJob.css";
 
 function DeleteJob({ company }) {
@@ -8,9 +9,12 @@ function DeleteJob({ company }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const mountedRef = useRef(true);
+  const { runTask } = useBackgroundTasks();
 
   // Fetch company jobs on component load
   useEffect(() => {
+    mountedRef.current = true;
     if (!company) return;
 
     const fetchJobs = async () => {
@@ -31,6 +35,10 @@ function DeleteJob({ company }) {
     };
 
     fetchJobs();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [company]);
 
   const handleDelete = async () => {
@@ -44,25 +52,57 @@ function DeleteJob({ company }) {
     );
     if (!confirmDelete) return;
 
+    const selectedJob = jobs.find((job) => job.jobId === selectedJobId);
     setLoading(true);
     setError("");
     setMessage("");
 
     try {
-      const data = await API.deleteJob(selectedJobId);
+      const { promise } = runTask(
+        {
+          type: "job-delete",
+          title: `Deleting job: ${selectedJob?.title || selectedJobId}`,
+          message: "Deleting selected job post...",
+          resume: {
+            kind: "api-call",
+            action: "deleteJob",
+            payload: { jobId: selectedJobId },
+            successMessage: "Job deleted successfully",
+          },
+        },
+        async ({ update }) => {
+          const data = await API.deleteJob(selectedJobId);
+          if (!data?.success) {
+            throw new Error(data?.message || "Failed to delete job");
+          }
+          update({ message: "Job deleted successfully" });
+          return data;
+        }
+      );
+
+      const data = await promise;
 
       if (data.success) {
-        setMessage("Job deleted successfully!");
-        setJobs(jobs.filter((job) => job.jobId !== selectedJobId));
-        setSelectedJobId("");
+        window.dispatchEvent(new Event("jobDeleted"));
+        if (mountedRef.current) {
+          setMessage("Job deleted successfully!");
+          setJobs(jobs.filter((job) => job.jobId !== selectedJobId));
+          setSelectedJobId("");
+        }
       } else {
-        setError(data.message || "Failed to delete job");
+        if (mountedRef.current) {
+          setError(data.message || "Failed to delete job");
+        }
       }
     } catch (err) {
       console.error("Error deleting job:", err);
-      setError("Error deleting job. Make sure backend is running.");
+      if (mountedRef.current) {
+        setError(err?.message || "Error deleting job. Make sure backend is running.");
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 

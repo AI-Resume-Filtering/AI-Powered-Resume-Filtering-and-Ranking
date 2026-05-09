@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class ThreadedEmailQueue:
     """Thread-safe in-process email queue with a single daemon consumer."""
 
-    def __init__(self, max_size: int = 100) -> None:
+    def __init__(self, max_size: int = 500) -> None:
         self._q: queue.Queue = queue.Queue(maxsize=max_size)
         self._thread = threading.Thread(
             target=self._worker,

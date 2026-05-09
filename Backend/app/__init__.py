@@ -12,6 +12,12 @@ for env_var in (
 ):
     os.environ.setdefault(env_var, "false" if env_var == "TOKENIZERS_PARALLELISM" else "1")
 
+# ⚠️ HuggingFace token: increases rate limits and model download speeds
+# Set HF_TOKEN environment variable in Render dashboard → Environment
+# Get token: https://huggingface.co/settings/tokens
+if os.getenv("HF_TOKEN"):
+    os.environ["HUGGING_FACE_HUB_TOKEN"] = os.getenv("HF_TOKEN")
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -33,21 +39,43 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    if not app.config.get("SMTP_HOST") or not app.config.get("SMTP_FROM"):
+        app.logger.warning(
+            "SMTP is not fully configured; selected-candidate emails will not be delivered until SMTP_HOST and SMTP_FROM are set."
+        )
+
     # Enable CORS for frontend access
-    # CORS_ORIGINS env var overrides defaults for production (comma-separated list)
-    raw_origins = os.getenv(
-        "CORS_ORIGINS",
-        "http://localhost:5173,http://localhost:5174,http://localhost:3000,"
-        "http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:3000"
-    )
-    allowed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
-    CORS(
-        app,
-        origins=allowed_origins,
-        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allow_headers=["Content-Type", "Authorization"],
-        supports_credentials=True,
-    )
+    # If CORS_ALLOW_ALL is true, allow all origins (useful for deployed environments)
+    # Otherwise, use CORS_ORIGINS env var (comma-separated list)
+    cors_allow_all = os.getenv("CORS_ALLOW_ALL", "false").lower() == "true"
+    
+    if cors_allow_all:
+        # Allow all origins - useful for production deployments
+        CORS(
+            app,
+            resources={r"/api/*": {"origins": "*"}},
+            methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allow_headers=["Content-Type", "Authorization"],
+            supports_credentials=False,  # Cannot use credentials with wildcard origins
+        )
+        app.logger.info("CORS: Allowing all origins (CORS_ALLOW_ALL=true)")
+        allowed_origins = None  # Indicates allow all
+    else:
+        # Use specific origins list (default for development)
+        raw_origins = os.getenv(
+            "CORS_ORIGINS",
+            "http://localhost:5173,http://localhost:5174,http://localhost:3000,"
+            "http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:3000"
+        )
+        allowed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
+        CORS(
+            app,
+            origins=allowed_origins,
+            methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allow_headers=["Content-Type", "Authorization"],
+            supports_credentials=True,
+        )
+        app.logger.info(f"CORS: Allowing specific origins: {allowed_origins}")
 
     init_mongo(app)
     register_blueprints(app)
@@ -72,8 +100,13 @@ def create_app():
 
     @app.after_request
     def add_cors_headers(response):
+        # If allowing all origins, headers already set by flask-cors
+        if cors_allow_all:
+            return response
+        
+        # For specific origins list, manually ensure headers are set
         request_origin = request.headers.get("Origin", "")
-        if request_origin in allowed_origins:
+        if allowed_origins and request_origin in allowed_origins:
             response.headers["Access-Control-Allow-Origin"] = request_origin
             response.headers["Vary"] = "Origin"
             response.headers["Access-Control-Allow-Credentials"] = "true"

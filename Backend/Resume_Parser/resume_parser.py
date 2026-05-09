@@ -82,13 +82,18 @@ class ResumeParser:
                 if (x1 - x0) < _MIN_IMAGE_WIDTH or (y1 - y0) < _MIN_IMAGE_HEIGHT:
                     continue
 
-                # Crop region → PIL Image → OCR
+                # Crop region → PIL Image → OCR.
+                # 150 DPI is sufficient for embedded images / charts and uses
+                # ~44% less memory than the previous 200 DPI setting.
                 pil_image = (
                     page.crop((x0, y0, x1, y1))
-                        .to_image(resolution=200)
+                        .to_image(resolution=150)
                         .original
                 )
-                ocr_text = image_to_text(pil_image)
+                try:
+                    ocr_text = image_to_text(pil_image)
+                finally:
+                    del pil_image
 
                 if ocr_text:
                     results.append(

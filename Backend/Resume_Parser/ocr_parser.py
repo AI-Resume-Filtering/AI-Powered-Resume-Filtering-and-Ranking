@@ -99,7 +99,9 @@ def _prepare_image(image) -> "np.ndarray":
     else:
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
-    gray = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+    # Skipping 2× upscale: pages are already captured at 200 DPI which gives
+    # adequate OCR quality.  The upscale quadrupled memory usage (e.g. ~62 MB
+    # per A4 page) and was the primary cause of OOM restarts on 512 MB hosts.
     gray = cv2.GaussianBlur(gray, (3, 3), 0)
     return cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
@@ -141,12 +143,20 @@ def extract_text_ocr(pdf_path: str) -> str:
     document = fitz.open(pdf_path)
     try:
         for page in document:
-            pixmap = page.get_pixmap(dpi=400, alpha=False)
+            # 200 DPI gives ~4× less memory than 400 DPI while retaining good
+            # OCR quality for standard text.  At 400 DPI a single A4 page
+            # produced a ~15 MB greyscale array before the (removed) 2× upscale
+            # pushed it to ~62 MB; at 200 DPI the array is ~3.9 MB.
+            pixmap = page.get_pixmap(dpi=200, alpha=False)
             image = np.frombuffer(pixmap.samples, dtype=np.uint8).reshape(
                 pixmap.height, pixmap.width, pixmap.n
             )
-            if page_text := image_to_text(image, psm=4):
-                text_parts.append(page_text)
+            try:
+                if page_text := image_to_text(image, psm=4):
+                    text_parts.append(page_text)
+            finally:
+                del image
+                del pixmap
     finally:
         document.close()
 
@@ -160,10 +170,14 @@ def extract_page_ocr(pdf_path: str, page_num: int) -> str:
     document = fitz.open(pdf_path)
     try:
         page = document.load_page(page_num - 1)
-        pixmap = page.get_pixmap(dpi=400, alpha=False)
+        pixmap = page.get_pixmap(dpi=200, alpha=False)
         image = np.frombuffer(pixmap.samples, dtype=np.uint8).reshape(
             pixmap.height, pixmap.width, pixmap.n
         )
-        return image_to_text(image, psm=4)
+        try:
+            return image_to_text(image, psm=4)
+        finally:
+            del image
+            del pixmap
     finally:
         document.close()
