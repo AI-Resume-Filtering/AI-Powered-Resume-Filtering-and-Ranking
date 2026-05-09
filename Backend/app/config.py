@@ -82,6 +82,19 @@ class Config:
     ALLOWED_RESUME_EXTENSIONS = {".pdf"}
     ALLOWED_JD_EXTENSIONS = {".pdf"}
 
+    # -- External embeddings API ---------------------------------------------------
+    # Used for semantic similarity scoring instead of a local sentence-transformers
+    # model.  Eliminates ~200 MB of PyTorch/SBERT memory on Render.
+    #
+    # Set ONE of the API keys below (or EMBEDDINGS_PROVIDER to pin a provider):
+    #   EMBEDDINGS_PROVIDER=openai  → OpenAI  text-embedding-3-small (recommended)
+    #   EMBEDDINGS_PROVIDER=cohere  → Cohere  embed-english-light-v3.0
+    #   EMBEDDINGS_PROVIDER=local   → local sentence-transformers (dev only)
+    # When no key is set the scorer falls back to TF-IDF cosine similarity.
+    EMBEDDINGS_PROVIDER = os.getenv("EMBEDDINGS_PROVIDER", "")
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    COHERE_API_KEY = os.getenv("COHERE_API_KEY", "")
+
     # -- Admin panel ---------------------------------------------------------------
     # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
     ADMIN_API_KEY = os.getenv("ADMIN_API_KEY", "")

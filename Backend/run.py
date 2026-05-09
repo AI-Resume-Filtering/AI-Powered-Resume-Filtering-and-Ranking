@@ -119,12 +119,6 @@ def _ensure_local_mongo_started():
     print(f"[startup] MongoDB did not start on {host}:{port}. Check log: {log_path}")
 
 
-# ⚠️ DO NOT WARMUP SBERT MODEL AT STARTUP
-# Models are loaded lazily on first use (see semantic_matcher.py)
-# Warmup at startup causes OOM on 512MB Render instances
-# print("[startup] SBERT model will be loaded on first request (lazy loading).")
-
-
 load_dotenv()
 
 if __name__ == "__main__":
@@ -144,9 +138,8 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         sys.exit(1)
-    
+
     # CRITICAL: Never use debug=True on Render (512MB memory limit)
-    # Debug mode uses development server with high memory & slower performance
     is_production = os.getenv("RENDER") == "true" or os.getenv("FLASK_ENV") == "production"
     flask_debug = False if is_production else os.getenv("FLASK_DEBUG", "0") == "1"
 
